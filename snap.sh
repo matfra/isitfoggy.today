@@ -66,9 +66,15 @@ while true; do
 	done
 	mkdir -p $PIC_DIR/$cur_date
 	capture_to_file "$TMP_PIC_PATH"
+	retry=1
 	while ! is_picture_close_enough_to_previous $TMP_PIC_PATH $PIC_DIR/latest.jpg ;do
-		echo "Capturing"
+		echo "Capturing (try: $retry)"
 		capture_to_file "$TMP_PIC_PATH"
+		retry=$(( $retry + 1))
+		if [[ $retry -gt 30 ]] ; then
+			echo "Giving up trying to find a good match"
+			break
+		fi
 	done
 	new_file_path=$PIC_DIR/$cur_date/$cur_time.jpg
 	cp $TMP_PIC_PATH $PIC_DIR/$cur_date/$cur_time.jpg
