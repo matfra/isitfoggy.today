@@ -37,5 +37,5 @@ done
 
 for i in $(find $yesterday_dir -type f -name '*.jpg' |sort -n) ; do echo "file '$i'" ; done > $PIC_DIR/timelapse.txt
 
-nice -n 10 ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v libvpx -crf 10 -b:v 7M -vf fps=24 $yesterday_dir/timelapse.webm
+nice -n 10 /usr/bin/ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v libvpx -crf 10 -b:v 7M -vf fps=24 $yesterday_dir/timelapse.webm && \
 ln -sf $yesterday_dir/timelapse.webm $PIC_DIR/latest.webm

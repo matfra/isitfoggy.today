@@ -46,10 +46,10 @@ function is_picture_close_enough_to_previous() {
 }
 
 function capture_to_file() {
-	FEED_URL="rtsp://192.168.31.135/onvif1"
+	FEED_URL="rtsp://192.168.31.132/onvif1"
 	outfile=$1
 	[[ -f $outfile  ]] && rm $outfile
-	ffmpeg -i $FEED_URL -v 16 -vframes 1 -q:v 4 $outfile
+	/usr/bin/ffmpeg -i $FEED_URL -v 16 -vframes 1 -q:v 4 $outfile
 }
 
 cur_user=$(whoami)
