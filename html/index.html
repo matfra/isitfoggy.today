@@ -5,7 +5,7 @@
 	</head>
 	<body bgcolor="#000000">
 		<img alt= "San Francisco realtime webcam weather" id="picture" src="/photos/latest.jpg" style="width: -webkit-fill-available;max-width: 100%;">
-		<p><a style="color:cyan" id="timelapse_link" href="/photos/latest.webm">Watch yesterday's timelapse</a></p>
+		<p><a style="color:cyan" href="timelapse.html">Watch yesterday's timelapse</a></p>
 		<p style="color:gray">Powered by Raspberry Pi zero</p>
 		<script language="javascript" type="text/javascript">
 		var picture = document.images['picture'];
@@ -25,10 +25,6 @@
 			picture.src = "/photos/latest.jpg?" + timestamp;
 			setInterval(refresh, 1000 * 60);
 		}
-		</script>
-		<script language="javascript" type="text/javascript">
-			var hourly_timestamp = Math.floor(new Date().getTime()/(1000*60*60*4));
-			document.getElementById('timelapse_link').href = "/photos/latest.webm?" + hourly_timestamp;
 		</script>
 	</body>
 </html>
