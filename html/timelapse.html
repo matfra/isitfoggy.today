@@ -9,7 +9,7 @@
 			<source src="/photos/latest.mp4" type="video/mp4">
 		</video>
 		<script language="javascript" type="text/javascript">
-			var timestamp = Math.floor(((new Date().getTime()/(1000*60*60))+4-8)/24);
+			var timestamp = Math.floor(((new Date().getTime()/(1000*60*60))-3-8)/24);
 			// Current epoch with an hourly precision -8 +4 because we expect the video
 			// to be generated at 4AM PST. Rounded to the day number since 1970-01-01
 			document.getElementById('video').src = '/photos/latest.mp4?' + timestamp ;
