@@ -1,30 +1,30 @@
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>Is San Francisco foggy today?</title>
-	</head>
-	<body bgcolor="#000000">
-		<img alt= "San Francisco realtime webcam weather" id="picture" src="/photos/latest.jpg" style="width: -webkit-fill-available;max-width: 100%;">
-		<p><a style="color:cyan" href="timelapse.html">Watch yesterday's timelapse</a></p>
-		<p style="color:gray">Powered by Raspberry Pi zero</p>
-		<script language="javascript" type="text/javascript">
-		var picture = document.images['picture'];
-		function refresh() {
-			var new_picture = new Image();
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Is San Francisco foggy today?</title>
+    </head>
+    <body bgcolor="#000000">
+        <img alt= "San Francisco realtime webcam weather" id="picture" src="/photos/latest.jpg" style="width: -webkit-fill-available;max-width: 100%;">
+        <p><a style="color:cyan" href="timelapse.html">Watch yesterday's timelapse</a></p>
+        <p style="color:gray">Powered by Raspberry Pi zero</p>
+        <script language="javascript" type="text/javascript">
+        var picture = document.images['picture'];
+        function refresh() {
+            var new_picture = new Image();
 
-			// replace the existing image once the new image has loaded
-			new_picture.onload = function () {
-				picture.src = new_picture.src;
-			}
+            // replace the existing image once the new image has loaded
+            new_picture.onload = function () {
+                picture.src = new_picture.src;
+            }
 
-			var timestamp = Math.floor(new Date().getTime()/(1000*60));
-			new_picture.src = "/photos/latest.jpg?" + timestamp;
-		}
-		window.onload = function() {
-			var timestamp = Math.floor(new Date().getTime()/(1000*60));
-			picture.src = "/photos/latest.jpg?" + timestamp;
-			setInterval(refresh, 1000 * 60);
-		}
-		</script>
-	</body>
+            var timestamp = Math.floor(new Date().getTime()/(1000*60));
+            new_picture.src = "/photos/latest.jpg?" + timestamp;
+        }
+        window.onload = function() {
+            var timestamp = Math.floor(new Date().getTime()/(1000*60));
+            picture.src = "/photos/latest.jpg?" + timestamp;
+            setInterval(refresh, 1000 * 60);
+        }
+        </script>
+    </body>
 </html>
