@@ -1,12 +1,13 @@
 #!/bin/bash -x
 
-ONE_DAY_TIMELAPSE_DURATION_SEC=30
+ONE_DAY_TIMELAPSE_DURATION_SEC=60
 TIMELAPSE_FRAMERATE=24
 PIC_DIR="/var/photos"
 PIC_DIR_SIZE=20000000
 #PIC_DIR_SIZE=100001
 TMP_PIC_PATH="/tmp/picture.jpg"
 DEFAULT_PERCENT_MATCH=92
+LOG_FILE="/tmp/snaplog.txt"
 
 function is_dir_bigger_than() {
 	dir=$1
@@ -16,12 +17,17 @@ function is_dir_bigger_than() {
 	[[ $dir_size -gt $limit ]] && return 0 || return 1
 }
 
+function log() {
+    echo "$(date): $1" >> $LOG_FILE
+}
 
 function get_shutter_speed() {
     measure_file="/tmp/measure.jpg"
-    raspistill -ISO 100 -w 200 -h 150 -o $measure_file -ss 500000
-    percent_light=$(convert $measure_file -resize 1x1 txt: |perl -n -e'/\((\d{1,}),(\d{1,}),(\d{1,})\)$/ && print int(100 * ($1 + $2 + $3) / (255 *3))')
-    [[ $percent_light -lt 10 ]] && echo 2000000 || echo "auto"
+    raspistill -sh -100 -ISO 100 -drc off -awb sun -ss 100000 -w 160 -h 90 -roi 0.3,0.30,0.5,0.4 -o $measure_file
+    percent_light=$(convert $measure_file -resize 1x1 txt: |perl -n -e'/\((\d{1,}),(\d{1,}),(\d{1,})\)$/ && print int(100 * ($3 / 255))')
+    [[ $percent_light -lt 10 ]] && echo "-ss 3000000"
+    log "percent_blue_light: $percent_light"
+    log "camera mesure: $(raspistill --settings 2>&1 |head -1)"
 }
 
 
@@ -65,9 +71,8 @@ function capture_to_file() {
 function capture_resize() {
     outfile=$1
     tmpfile="/tmp/capture.jpg"
-    ss=$(get_shutter_speed)
-    raspistill -sh 100 -ISO 100 -co 15 -drc off -ss $ss -sa 10 -o $tmpfile
-    convert $tmpfile -crop 2730x1536+540+553 -resize 1280x720 $outfile
+    ss_flag=$(get_shutter_speed)
+    raspistill -sh 100 -ISO 100 -co 15 $ss_flag -sa 7 -w 1920 -h 1080 -roi 0,0.17,0.80,1 -th none -q 16 -o $outfile
 }
 
 cur_user=$(whoami)
