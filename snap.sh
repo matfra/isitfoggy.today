@@ -25,9 +25,13 @@ function get_shutter_speed() {
     measure_file="/tmp/measure.jpg"
     raspistill -sh -100 -ISO 100 -drc off -awb sun -ss 100000 -w 160 -h 90 -roi 0.3,0.30,0.5,0.4 -o $measure_file
     percent_light=$(convert $measure_file -resize 1x1 txt: |perl -n -e'/\((\d{1,}),(\d{1,}),(\d{1,})\)$/ && print int(100 * ($3 / 255))')
-    [[ $percent_light -lt 10 ]] && echo "-ss 3000000"
     log "percent_blue_light: $percent_light"
     log "camera mesure: $(raspistill --settings 2>&1 |head -1)"
+    [[ $percent_light -lt 5 ]] && echo "-ss 3000000" && return 0
+    [[ $percent_light -lt 7 ]] && echo "-ss 2500000" && return 0
+    [[ $percent_light -lt 10 ]] && echo "-ss 2000000" && return 0
+    [[ $percent_light -lt 15 ]] && echo "-ss 1500000" && return 0
+    [[ $percent_light -lt 20 ]] && echo "-ss 1000000" && return 0
 }
 
 
