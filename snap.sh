@@ -4,7 +4,6 @@ ONE_DAY_TIMELAPSE_DURATION_SEC=60
 TIMELAPSE_FRAMERATE=24
 PIC_DIR="/var/photos"
 PIC_DIR_SIZE=20000000
-#PIC_DIR_SIZE=100001
 TMP_PIC_PATH="/tmp/picture.jpg"
 DEFAULT_PERCENT_MATCH=92
 LOG_FILE="/tmp/snaplog.txt"
@@ -21,12 +20,17 @@ function log() {
     echo "$(date): $1" >> $LOG_FILE
 }
 
-function get_shutter_speed() {
+
+function get_light() {
     measure_file="/tmp/measure.jpg"
     raspistill -sh -100 -ISO 100 -drc off -awb sun -ss 100000 -w 160 -h 90 -roi 0.3,0.30,0.5,0.4 -o $measure_file
     percent_light=$(convert $measure_file -resize 1x1 txt: |perl -n -e'/\((\d{1,}),(\d{1,}),(\d{1,})\)$/ && print int(100 * ($3 / 255))')
     log "percent_blue_light: $percent_light"
-    log "camera mesure: $(raspistill --settings 2>&1 |head -1)"
+    echo $percent_light
+}
+
+function get_shutter_speed() {
+    percent_light=$1
     [[ $percent_light -lt 5 ]] && echo "-ss 3000000" && return 0
     [[ $percent_light -lt 7 ]] && echo "-ss 2500000" && return 0
     [[ $percent_light -lt 10 ]] && echo "-ss 2000000" && return 0
@@ -34,6 +38,11 @@ function get_shutter_speed() {
     [[ $percent_light -lt 20 ]] && echo "-ss 1000000" && return 0
 }
 
+function get_snap_interval() {
+    percent_light=$1
+    [[ $percent_light -lt 30 ]] && [[ $percent_light -gt 5 ]] && echo 20 && return 0
+    echo 100 && return 0
+}
 
 function purge_oldest_day_in_dir() {
 	dir=$1
@@ -72,10 +81,11 @@ function capture_to_file() {
 	/usr/bin/ffmpeg -i $FEED_URL -v 16 -vframes 1 -q:v 4 $outfile
 }
 
-function capture_resize() {
+function capture() {
     outfile=$1
+    light=$2
     tmpfile="/tmp/capture.jpg"
-    ss_flag=$(get_shutter_speed)
+    ss_flag=$(get_shutter_speed $2)
     raspistill -sh 100 -ISO 100 -co 15 $ss_flag -sa 7 -w 1920 -h 1080 -roi 0,0.17,0.80,1 -th none -q 16 -o $outfile
 }
 
@@ -85,8 +95,6 @@ if ! touch $PIC_DIR/write_test ; then
 	sudo chown -R $cur_user $PIC_DIR
 fi
 
-pics_per_day=$(( $TIMELAPSE_FRAMERATE * $ONE_DAY_TIMELAPSE_DURATION_SEC ))
-snap_interval=$(( 24 * 3600 / $pics_per_day ))
 
 while true; do
 	cur_date=$(date +%Y-%m-%d)
@@ -95,7 +103,9 @@ while true; do
 		purge_oldest_day_in_dir "$PIC_DIR"
 	done
 	mkdir -p $PIC_DIR/$cur_date
-	capture_resize "$TMP_PIC_PATH"
+    percent_light=$(get_light)
+    snap_interval=$(get_snap_interval $percent_light)
+	capture "$TMP_PIC_PATH" $percent_light
 	new_file_path=$PIC_DIR/$cur_date/$cur_time.jpg
 	cp $TMP_PIC_PATH $PIC_DIR/$cur_date/$cur_time.jpg
 	ln -sf $new_file_path $PIC_DIR/latest.jpg
