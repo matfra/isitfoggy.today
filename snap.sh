@@ -31,16 +31,13 @@ function get_light() {
 
 function get_shutter_speed() {
     percent_light=$1
-    [[ $percent_light -lt 5 ]] && echo "-ss 3000000" && return 0
-    [[ $percent_light -lt 7 ]] && echo "-ss 2500000" && return 0
-    [[ $percent_light -lt 10 ]] && echo "-ss 2000000" && return 0
-    [[ $percent_light -lt 15 ]] && echo "-ss 1500000" && return 0
-    [[ $percent_light -lt 20 ]] && echo "-ss 1000000" && return 0
+    [[ $percent_light -gt 86 ]] && return 0
+    python -c "print('-ss %d'%int(3000000*2.71828**(-${percent_light}/18.518)))"
 }
 
 function get_snap_interval() {
     percent_light=$1
-    [[ $percent_light -lt 30 ]] && [[ $percent_light -gt 5 ]] && echo 20 && return 0
+    [[ $percent_light -lt 86 ]] && [[ $percent_light -gt 5 ]] && echo 10 && return 0
     echo 100 && return 0
 }
 
