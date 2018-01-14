@@ -44,3 +44,14 @@ echo "Timelapse complete. Waiting 100 seconds before preloading it into cloudfla
 sleep 100
 curl "https://isitfoggy.today/photos/latest.mp4?$(( ( ( $(date +%s) / 3600) -11)/24 ))" -o /dev/null
 
+yesterday_date=$(basename $yesterday_dir)
+ftp -n 192.168.31.1 <<END_SCRIPT
+quote USER anonymous
+quote PASS blah
+cd USB3
+cd isitfoggy_timelapse
+bin
+put $yesterday_dir/timelapse.mp4 $yesterday_date.mp4
+quit
+END_SCRIPT
+exit 0
