@@ -83,7 +83,7 @@ function capture() {
     light=$2
     tmpfile="/tmp/capture.jpg"
     ss_flag=$(get_shutter_speed $2)
-    raspistill -sh 100 -ISO 100 -co 15 $ss_flag -sa 7 -w 1920 -h 1080 -roi 0,0.17,0.80,1 -th none -q 16 -o $outfile
+    raspistill -sh 100 -ISO 100 -co 15 $ss_flag -sa 7 -w 1920 -h 1080 -roi 0,0.17,0.80,1 -n -a 12 -th none -q 16 -o $outfile
 }
 
 cur_user=$(whoami)

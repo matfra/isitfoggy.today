@@ -82,6 +82,10 @@ server {
         autoindex on;
     }
 
+    location /test {
+        autoindex on;
+    }
+
 	location / {
 		# First attempt to serve request as file, then
 		# as directory, then fall back to displaying a 404.
