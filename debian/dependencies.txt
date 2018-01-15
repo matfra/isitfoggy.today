@@ -1,0 +1,4 @@
+jq
+python
+curl
+ffmpeg

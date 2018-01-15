@@ -1,0 +1,10 @@
+[Unit]
+Description=Is it foggy snapshot service
+
+[Service]
+ExecStart=/opt/isitfoggy/snap.sh
+StandardOutput=null
+
+[Install]
+WantedBy=multi-user.target
+Alias=isitfoggy.service
