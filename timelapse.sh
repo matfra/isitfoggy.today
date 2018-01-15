@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -ex
 
 TIMELAPSE_FRAMERATE=24
 PIC_DIR="/var/lib/isitfoggy/photos"
@@ -30,12 +30,12 @@ function send_to_ftp() {
     bin
     put $yesterday_dir/timelapse.mp4 $FTP_REMOTE_DIR/$yesterday_date.mp4
     quit
-    END_SCRIPT
+END_SCRIPT
 }
 
 cur_date=$(date +%Y-%m-%d)
 today_dir=$PIC_DIR/$cur_date
-yesterday_dir=$(find $PIC_DIR -type d -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" |sort -n |tail -2 |head -1)
+yesterday_dir=$(find $PIC_DIR/ -type d -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" |sort -n |tail -2 |head -1)
 yesterday_date=$(basename $yesterday_dir)
 
 echo "Today's dir: $today_dir"
@@ -55,7 +55,7 @@ for i in $(find $yesterday_dir -type f -name '*.jpg' |sort -n) ; do echo "file '
 nice -n 10 /usr/local/bin/ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v h264_omx -b:v 12M -vf fps=24 $yesterday_dir/timelapse.mp4 && \
 ln -sf $yesterday_dir/timelapse.mp4 $PIC_DIR/latest.mp4
 
-[[ -z $FTP_HOST ]] && send_to_ftp
+[[ -z $FTP_HOST ]] || send_to_ftp
 
 echo "Timelapse complete. Waiting 100 seconds before preloading it into cloudflare cache"
 sleep 100
