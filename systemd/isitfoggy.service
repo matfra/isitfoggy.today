@@ -2,8 +2,9 @@
 Description=Is it foggy snapshot service
 
 [Service]
-ExecStart=/opt/isitfoggy/snap.sh
+ExecStart=/usr/share/isitfoggy/snap.sh
 StandardOutput=null
+User=isitfoggy
 
 [Install]
 WantedBy=multi-user.target

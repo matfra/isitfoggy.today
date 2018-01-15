@@ -4,8 +4,9 @@ ONE_DAY_TIMELAPSE_DURATION_SEC=60
 TIMELAPSE_FRAMERATE=24
 PIC_DIR="/var/photos"
 PIC_DIR_SIZE=20000000
-TMP_PIC_PATH="/tmp/picture.jpg"
-LOG_FILE="/var/log/isitfoggy.log"
+TMP_PIC_PATH="$(mktemp).jpg"
+MEASURE_FILE="$(mktemp).jpg"
+LOG_FILE="/var/log/isitfoggy/snap.log"
 
 function is_dir_bigger_than() {
 	dir=$1
@@ -21,9 +22,8 @@ function log() {
 
 
 function get_light() {
-    measure_file="/tmp/measure.jpg"
-    raspistill -sh -100 -ISO 100 -drc off -awb sun -ss 100000 -w 160 -h 90 -roi 0.3,0.30,0.5,0.4 -o $measure_file
-    percent_light=$(convert $measure_file -resize 1x1 txt: |perl -n -e'/\((\d{1,}),(\d{1,}),(\d{1,})\)$/ && print int(100 * ($3 / 255))')
+    raspistill -sh -100 -ISO 100 -drc off -awb sun -ss 100000 -w 160 -h 90 -roi 0.3,0.30,0.5,0.4 -o $MEASURE_FILE
+    percent_light=$(convert $MEASURE_FILE -resize 1x1 txt: |perl -n -e'/\((\d{1,}),(\d{1,}),(\d{1,})\)$/ && print int(100 * ($3 / 255))')
     log "percent_blue_light: $percent_light"
     echo $percent_light
 }
