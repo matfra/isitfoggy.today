@@ -5,12 +5,6 @@
 
 source config.sh
 
-DOMAIN="isitfoggy.today"
-HOST_TO_PROBE="zero.$DOMAIN"
-EMAIL="albertmornington@gmail.com"
-API_KEY="4cd6196710d0c45281e668e388dc714ac2bd1"
-
-
 echo -n "Checking local IP Address: "
 my_ip=$(curl -s ifconfig.me)
 echo $my_ip
