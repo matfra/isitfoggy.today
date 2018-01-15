@@ -2,28 +2,68 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>Is San Francisco foggy today?</title>
+        <style type="text/css">
+            #webcam-picture {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                background-image: url(/photos/latest.jpg);
+                background-size: cover;
+            }
+            .timelapse-link-container {
+                position: absolute;
+                left: 9px;
+                bottom: 3px;
+            }
+            .timelapse-link {
+                color: #fff;
+                font-size: 16px;
+                font-family: Helvetica Neue, sans-serif;
+                letter-spacing: 1px;
+                text-shadow: 0 1px #000;
+                text-decoration: none;
+                opacity: 0.9;
+            }
+            .timelapse-link:hover {
+                text-decoration: underline;
+                opacity: 1;
+            }
+            .powered-by {
+                position: absolute;
+                right: 6px;
+                bottom: 3px;
+
+                color: #ccc;
+                font-size: 12px;
+                font-family: Helvetica Neue, sans-serif;
+                letter-spacing: 1px;
+            }
+        </style>
     </head>
     <body style="background: black; margin: 0;">
-        <div class=""></div>
-        <img alt= "San Francisco realtime webcam weather" id="picture" src="/photos/latest.jpg" style="width: -webkit-fill-available; max-width: 100%;">
-        <p><a style="color:cyan" href="timelapse.html">Watch yesterday's timelapse</a></p>
-        <p style="color:gray">Powered by Raspberry Pi zero</p>
+        <div id="webcam-picture">
+            <div class="timelapse-link-container">
+                <a class="timelapse-link" href="timelapse.html">watch yesterday's timelapse</a>
+            </div>
+            <div class="powered-by">Powered by Raspberry Pi zero</div>
+        </div>
         <script language="javascript" type="text/javascript">
-        var picture = document.images['picture'];
+        var picture = document.getElementById('webcam-picture');
         function refresh() {
-            var new_picture = new Image();
+            var newPicture = new Image();
 
             // replace the existing image once the new image has loaded
-            new_picture.onload = function () {
-                picture.src = new_picture.src;
+            newPicture.onload = function () {
+                picture.style.backgroundImage = 'url(' + newPicture.src + ')';
             }
 
             var timestamp = Math.floor(new Date().getTime()/(1000*60));
-            new_picture.src = "/photos/latest.jpg?" + timestamp;
+            newPicture.src = '/photos/latest.jpg?' + timestamp;
         }
+
         window.onload = function() {
             var timestamp = Math.floor(new Date().getTime()/(1000*60));
-            picture.src = "/photos/latest.jpg?" + timestamp;
+            picture.style.backgroundImage = 'url(/photos/latest.jpg?' + timestamp + ')';
             setInterval(refresh, 1000 * 60);
         }
         </script>
