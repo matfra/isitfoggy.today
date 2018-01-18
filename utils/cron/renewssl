@@ -2,12 +2,5 @@
 
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-
-# One triggers the timelapse build every night at 1.04AM
-01 4	* * *	isitfoggy	/opt/isitfoggy/timelapse.sh
-
 # One stops nginx and eventually renew certificates every months
 01 2	10 * * 	root 	systemctl stop nginx ; certbot renew ; systemctl start nginx
-
-Update DNS entry with Cloudflare in case our public IP change
-01 3	* * * 	isitfoggy 	/opt/isitfoggy/utils/update_dns.sh

@@ -1,33 +1,57 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <title>Is San Francisco foggy today?</title>
+        <script src="lib/exif.min.js"></script>
         <style type="text/css">
             #webcam-picture {
                 position: relative;
                 width: 100%;
                 height: 100%;
                 background-image: url(/photos/latest.jpg);
-                background-size: cover;
+                background-size: 100% auto;
+                background-repeat: no-repeat;
             }
-            .timelapse-link-container {
-                position: absolute;
-                left: 9px;
-                bottom: 3px;
+            .icon {
+                width: 32px;
+                height: 32px;
+                background-size: 100% 100%;
+                background-repeat: no-repeat;
+                opacity: 0.7;
             }
-            .timelapse-link {
-                color: #fff;
-                font-size: 16px;
-                font-family: Helvetica Neue, sans-serif;
-                letter-spacing: 1px;
-                text-shadow: 0 1px #000;
-                text-decoration: none;
-                opacity: 0.9;
-            }
-            .timelapse-link:hover {
-                text-decoration: underline;
+            .icon:hover {
                 opacity: 1;
             }
+
+            .timelapse-icon {
+                background-image: url(icons/play-button.svg);
+            }
+
+            .github-icon {
+                background-image: url(icons/github.png);
+            }
+
+            .download-icon {
+                background-image: url(icons/download.svg);
+            }
+
+            .share-icon {
+                background-image: url(icons/share.svg);
+            }
+
+            .info-icon {
+                background-image: url(icons/info.svg);
+            }
+
+            .links-container {
+                position: absolute;
+                top: 0;
+                right: 0;
+                margin: 9px;
+            }
+
             .powered-by {
                 position: absolute;
                 right: 6px;
@@ -38,33 +62,227 @@
                 font-family: Helvetica Neue, sans-serif;
                 letter-spacing: 1px;
             }
+
+            .iconed-link-container {
+                position: relative;
+                display: inline-block;
+                margin: 3px;
+            }
+
+            .iconed-link-help-text {
+                display: none;
+                position: absolute;
+                right: -3px;
+
+                padding: 9px;
+                margin-top: 21px;
+                margin-left: 30px;
+
+                -webkit-border-radius: 6px;
+                -moz-border-radius: 6px;
+                border-radius: 6px;
+
+                background: rgba(255, 255, 255, 0.8);
+                color: black;
+
+                font-family: Helvetica Neue, sans-serif;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+            .iconed-link-help-text::before {
+                content: "";
+                display: block;
+                position: absolute;
+                top: -12px;
+                right: 12px;
+                width: 0;
+                border-width: 0 9px 12px;
+                border-color: rgba(255, 255, 255, 0.8) transparent;
+                border-style: solid;
+            }
+
+            #exif-info-modal {
+                display: none;
+                position: absolute;
+                top: 6px;
+                left: 3px;
+                
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 6px;
+            }
+
+            #exif-info-modal table {
+                font-family: Helvetica Neue, sans-serif;
+                font-size: 12px;
+            }
+
+            .exif-tag {
+                font-weight: bold;
+            }
+
         </style>
     </head>
     <body style="background: black; margin: 0;">
         <div id="webcam-picture">
-            <div class="timelapse-link-container">
-                <a class="timelapse-link" href="timelapse.html">watch yesterday's timelapse</a>
+            <div class="links-container">
+                <div class="iconed-link-container">
+                    <a class="timelapse-link" href="timelapse.html"><div class="icon timelapse-icon"></div></a>
+                    <div class="timelapse-link-help-text iconed-link-help-text">watch yesterday's timelapse</div>
+                </div>
+                <div class="iconed-link-container">
+                    <a class="github-link" href="https://github.com/matfra/isitfoggy.today" target="_blank">
+                        <div class="icon github-icon"></div>
+                    </a>
+                    <div class="github-link-help-text iconed-link-help-text">check out the code on github<br></div>
+                </div>
+                <div class="iconed-link-container">
+                    <a class="download-link" href="/photos/latest.jpg" download="isitfoggy">
+                        <div class="icon download-icon"></div>
+                    </a>
+                    <div class="download-link-help-text iconed-link-help-text">download the current image<br></div>
+                </div>
+                <div class="iconed-link-container">
+                    <a class="share-link" href="javascript:;">
+                        <div class="icon share-icon"></div>
+                    </a>
+                    <div class="share-link-help-text iconed-link-help-text">share the current image<br></div>
+                </div>
+                <div class="iconed-link-container">
+                    <a class="info-link" href="javascript:;">
+                        <div class="icon info-icon"></div>
+                    </a>
+                    <div class="info-link-help-text iconed-link-help-text">you are currently viewing san francisco<br>live from our bedroom terrace</div>
+                </div>
             </div>
             <div class="powered-by">Powered by Raspberry Pi zero</div>
+
+            <div id="exif-info-modal">
+                <table>
+                    <tr>
+                        <td class="exif-tag">Make</td>
+                        <td class="exif-value" id="exif-make"></td>
+                    </tr>
+                    <tr>
+                        <td class="exif-tag">Model</td>
+                        <td class="exif-value" id="exif-model"></td>
+                    </tr>
+                    <tr>
+                        <td class="exif-tag">Speed</td>
+                        <td class="exif-value" id="exif-exposure-time"></td>
+                    </tr>
+                    <tr>
+                        <td class="exif-tag">F Number</td>
+                        <td class="exif-value" id="exif-f-number"></td>
+                    </tr>
+                    <tr>
+                        <td class="exif-tag">ISO</td>
+                        <td class="exif-value" id="exif-iso-speed-rating"></td>
+                    </tr>
+                </table>
+            </div>
         </div>
         <script language="javascript" type="text/javascript">
         var picture = document.getElementById('webcam-picture');
+
+        var exifMake = document.getElementById('exif-make');
+        var exifModel = document.getElementById('exif-model');
+        var exifExposureTime = document.getElementById('exif-exposure-time');
+        var exifFNumber = document.getElementById('exif-f-number');
+        var exifISOSpeedRating = document.getElementById('exif-iso-speed-rating');
+        var exifInfoModal = document.getElementById('exif-info-modal');
+
+        var downloadLink = document.getElementsByClassName('download-link')[0];
+
         function refresh() {
             var newPicture = new Image();
 
             // replace the existing image once the new image has loaded
             newPicture.onload = function () {
                 picture.style.backgroundImage = 'url(' + newPicture.src + ')';
+
+                EXIF.getData(newPicture, function() {
+                    exifMake.innerHTML = EXIF.getTag(this, "Make");
+                    exifModel.innerHTML = EXIF.getTag(this, "Model");
+                    exifFNumber.innerHTML = EXIF.getTag(this, "FNumber");
+                    exifISOSpeedRating.innerHTML = EXIF.getTag(this, "ISOSpeedRatings");
+                    exifExposureTime.innerHTML = parseFloat(EXIF.getTag(this, "ExposureTime")).toFixed(2) + 's';
+                });
             }
 
-            var timestamp = Math.floor(new Date().getTime()/(1000*60));
+            var timestamp = Math.floor(Date.now()/(1000*60));
+
             newPicture.src = '/photos/latest.jpg?' + timestamp;
+            downloadLink.href = newPicture.src;
+            downloadLink.download = 'isitfoggy-' + Math.floor(Date.now()/1000);
+        }
+
+        function bindIconedLinkHoverEvent(prefix) {
+            var iconedLink = document.getElementsByClassName(prefix + '-link')[0];
+            var iconedHelpText = document.getElementsByClassName(prefix + '-link-help-text')[0];
+            iconedLink.addEventListener('mouseenter', function(e) {
+                iconedHelpText.style.display = 'block';
+            });
+            iconedLink.addEventListener('mouseleave', function(e) {
+                iconedHelpText.style.display = 'none';
+            });
+        }
+
+        function isMobile() {
+            return /Mobi/i.test(navigator.userAgent);
+        }
+
+        function shouldShowInfo() {
+            var show = false;
+            try {
+                var queryParams = location.search.substring(location.search.indexOf('?')+1).split('&');
+                queryParams.forEach(function(param) {
+                    var kvpair = param.split('=');
+                    if (kvpair[0] === 'info' && parseInt(kvpair[1])) {
+                        show = true;    
+                    }
+                });
+            } catch(err) {
+                // do nothing
+            }
+
+            return show;
         }
 
         window.onload = function() {
             var timestamp = Math.floor(new Date().getTime()/(1000*60));
-            picture.style.backgroundImage = 'url(/photos/latest.jpg?' + timestamp + ')';
+
+            refresh();
             setInterval(refresh, 1000 * 60);
+
+            if (!isMobile()) {
+                bindIconedLinkHoverEvent('timelapse');
+                bindIconedLinkHoverEvent('github');
+                bindIconedLinkHoverEvent('download');
+                bindIconedLinkHoverEvent('share');
+                bindIconedLinkHoverEvent('info');
+            }
+
+            if (shouldShowInfo()) {
+                exifInfoModal.style.display = 'block';
+            }
+
+            var infoLink = document.getElementsByClassName('info-link')[0];
+            infoLink.addEventListener('click', function(e) {
+                if (exifInfoModal.style.display !== 'block') {
+                    exifInfoModal.style.display = 'block';
+                } else {
+                    exifInfoModal.style.display = 'none';
+                }
+            });
+
+            var shareLink = document.getElementsByClassName('share-link')[0];
+            shareLink.addEventListener('click', function(e) {
+                navigator.share({
+                    title: 'isitfoggy.today',
+                    text: 'Is it foggy in San Francisco today?',
+                    url: location.href
+                });
+            });
         }
         </script>
     </body>

@@ -1,0 +1,7 @@
+# /etc/cron.d/isitfoggy: Multiple crontab entries to maintain the site up and running
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+#Update DNS entry with Cloudflare in case our public IP change
+01 3	* * * 	isitfoggy 	/opt/isitfoggy/utils/update_dns.sh

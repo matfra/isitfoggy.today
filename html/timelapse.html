@@ -1,11 +1,22 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
 		<title>Timelaspe over San Francisco</title>
+        <style type="text/css">
+            body {
+                background: #000;
+                margin: 0;
+            }
+            video {
+                width: 100%;
+                height: auto;
+            }
+        </style>
 	</head>
-	<body bgcolor="#000000">
-		<p><a style="color:cyan" id="timelapse_link" href="/">Back</a></p>
-		<video id= "video" width="100%" height="auto" controls>
+	<body>
+		<video id= "video" controls autoplay loop muted>
 			<source src="/photos/latest.mp4" type="video/mp4">
 		</video>
 		<script language="javascript" type="text/javascript">
