@@ -18,11 +18,18 @@ Configurations for
 ## Installation
 
 Please install the following dependencies:
-- jq
+
+To take pictures
 - python
-- curl
 - ffmpeg (If you want HW accelaration on Raspberry Pi: you can build it via the script provided in utils/)
+
+To server the site:
 - nginx
+
+To setup your own DNS entry and SSL cert
+- certbot
+- curl
+- jq
 
 Create the isitfoggy user and home directories
 ```bash
@@ -39,7 +46,17 @@ Clone the repo and launch the install script
 ```bash
 git clone git@github.com:matfra/isitfoggy.today.git /opt/isitfoggy
 cd /opt/isitfoggy
-sudo ./install
+```
+
+Edit the configuration file
+```shell
+cp conf/isitfoggy.example conf/isitfoggy.conf
+vim conf/isitfoggy.conf
+```
+
+Run the installer that will create a bunch of symlinks, services and stuff
+```
+sudo ./install.sh
 ```
 
 

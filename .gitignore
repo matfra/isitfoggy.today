@@ -1,4 +1,4 @@
+conf/isitfoggy.conf
 *.swp
 *.swo
 html/test/
-utils/config.sh

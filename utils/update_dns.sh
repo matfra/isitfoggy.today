@@ -3,7 +3,8 @@
 # Update the cloudflare DNS entry to match the public IP address
 # Requires curl, jq, dig(dnsutils)
 
-source config.sh
+CONFIG_FILE=/etc/isitfoggy.conf
+source $CONFIG_FILE
 
 echo -n "Checking local IP Address: "
 my_ip=$(curl -s ifconfig.me)
@@ -20,8 +21,8 @@ fi
 
 echo -n "Getting zone id for $DOMAIN: "
 result=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=$DOMAIN&status=active&page=1&per_page=20&order=status&direction=desc&match=all" \
-     -H "X-Auth-Email: $EMAIL" \
-     -H "X-Auth-Key: $API_KEY" \
+     -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
+     -H "X-Auth-Key: $CLOUDFLARE_$API_KEY" \
      -H "Content-Type: application/json")
 zoneid=$(echo "$result" | jq -r '.result | map(select(.name == "isitfoggy.today"))[].id')
 echo $zoneid
@@ -29,8 +30,8 @@ echo $zoneid
 for a_record in $DOMAIN $HOST_TO_PROBE ; do
 	echo -n "Getting A record ID for $a_record: "
 	dns_records=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records?type=A&name=$a_record&page=1&per_page=20&order=type&direction=desc&match=all" \
-     -H "X-Auth-Email: $EMAIL" \
-     -H "X-Auth-Key: $API_KEY" \
+     -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
+     -H "X-Auth-Key: $CLOUDFLARE_$API_KEY" \
      -H "Content-Type: application/json")
 	dns_id=$(echo "$dns_records" | jq -r '.result[0].id')
 	echo $dns_id
@@ -39,8 +40,8 @@ for a_record in $DOMAIN $HOST_TO_PROBE ; do
 
 	echo "Updating A record $a_record to $my_ip: "
 	result=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$zoneid/dns_records/$dns_id" \
-     -H "X-Auth-Email: $EMAIL" \
-     -H "X-Auth-Key: $API_KEY" \
+     -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
+     -H "X-Auth-Key: $CLOUDFLARE_$API_KEY" \
      -H "Content-Type: application/json" \
      --data "{\"type\":\"A\",\"name\":\"$a_record\",\"content\":\"$my_ip\",\"proxied\":$proxied}")
 	echo "$result" |jq .

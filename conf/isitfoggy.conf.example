@@ -1,0 +1,16 @@
+#!/bin/bash
+# This file get sourced
+
+TIMELAPSE_FRAMERATE=24
+PIC_DIR=/var/lib/isitfoggy/photos
+PIC_DIR_SIZE=20000000
+LOG_DIR="/var/log/isitfoggy"
+TMP_DIR="/var/tmp/isitfoggy"
+
+#Required by update_dns.sh
+
+#This is a DNS entry that point directly to your host
+HOST_TO_PROBE="mynotsosecretserver.isitfoggy.today"
+DOMAIN="location.isitfoggy.today"
+CLOUDFLARE_EMAIL="me@example.com"
+CLOUDFLARE_API_KEY="foiewqhjfoefu98323n2oiu328"
