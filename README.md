@@ -6,6 +6,9 @@ during the day and night and every 10 seconds during sunrise/sunset
 
 At the end of the day, it will generate a timelapse in mp4 format
 
+https://isitfoggy.today
+
+
 Everything is viewable via a simple html page
 
 Configurations for
@@ -23,7 +26,7 @@ To take pictures
 - python
 - ffmpeg (If you want HW accelaration on Raspberry Pi: you can build it via the script provided in utils/)
 
-To server the site:
+To serve the site:
 - nginx
 
 To setup your own DNS entry and SSL cert
