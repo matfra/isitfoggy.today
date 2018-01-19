@@ -14,9 +14,40 @@ Configurations for
 - cloudflare DNS/cache
 - crontab
 
+
+## Installation
+
+Please install the following dependencies:
+- jq
+- python
+- curl
+- ffmpeg (If you want HW accelaration on Raspberry Pi: you can build it via the script provided in utils/)
+- nginx
+
+Create the isitfoggy user and home directories
+```bash
+sudo useradd -d /opt/isitfoggy -m -G video -s /bin/nologin isitfoggy
+sudo chown -R g+w /opt/isitfoggy
+```
+
+Add yourself to the isitfoggy group so you can write stuff in that dir
+```bash
+sudo usermod -G isitfoggy -a $USER
+```
+
+Clone the repo and launch the install script
+```bash
+git clone git@github.com:matfra/isitfoggy.today.git /opt/isitfoggy
+cd /opt/isitfoggy
+sudo ./install
+```
+
+
+
 ## TO-DO:
 ### Frontend
 - Add a javascript realtime fog/visibility analysis
 ### Backend
 - Package everything into a .deb
 - Create a true shared library
+- Allow people to write their own camera wrapper

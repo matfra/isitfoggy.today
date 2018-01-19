@@ -1,17 +1,15 @@
 #!/bin/bash -x
+CONFIG_FILE=/etc/isitfoggy.conf
 
-ONE_DAY_TIMELAPSE_DURATION_SEC=60
-TIMELAPSE_FRAMERATE=24
-PIC_DIR="/var/photos"
-PIC_DIR_SIZE=20000000
-TMP_PIC_PATH="$(mktemp).jpg"
-MEASURE_FILE="$(mktemp).jpg"
-LOG_FILE="/var/log/isitfoggy/snap.log"
+function check_config() {
+    #TODO
+    return 0
+}
 
 function is_dir_bigger_than() {
 	dir=$1
 	limit=$2
-	dir_size=$(du -s $dir |awk '{print $1}')
+	dir_size=$(du -s $dir/ |awk '{print $1}')
 	limit=$2
 	[[ $dir_size -gt $limit ]] && return 0 || return 1
 }
@@ -50,21 +48,30 @@ function purge_oldest_day_in_dir() {
 function capture() {
     outfile=$1
     light=$2
-    tmpfile="/tmp/capture.jpg"
     ss_flag=$(get_shutter_speed $2)
     raspistill -sh 100 -ISO 100 -co 15 $ss_flag -sa 7 -w 1920 -h 1080 -roi 0,0.17,0.80,1 -n -a 12 -th none -q 16 -o $outfile
 }
 
-cur_user=$(whoami)
-if ! touch $PIC_DIR/write_test ; then
-	sudo mkdir -p $PIC_DIR
-	sudo chown -R $cur_user $PIC_DIR
-fi
+function test_dir_write() {
+    if ! touch $1/write_test ; then
+        echo "Cannot write in $1. Exiting"
+        exit 1
+    fi
+}
 
+check_config
+source $CONFIG_FILE
+test_dir_write $PIC_DIR
+test_dir_write $TMP_DIR
+test_dir_write $LOG_DIR
+
+TMP_PIC_PATH="$TMP_DIR/snap.jpg"
+MEASURE_FILE="$TMP_DIR/measure.jpg"
+LOG_FILE="$LOG_DIR/$(basename $0).log"
 
 while true; do
 	cur_date=$(date +%Y-%m-%d)
-	cur_time=$(date +%H:%M:%S)
+	cur_time=$(date +%H%M%S)
 	while is_dir_bigger_than "$PIC_DIR" $PIC_DIR_SIZE ; do
 		purge_oldest_day_in_dir "$PIC_DIR"
 	done

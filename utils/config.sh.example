@@ -1,4 +1,0 @@
-DOMAIN="example.com"
-HOST_TO_PROBE="www1.$DOMAIN"
-EMAIL="cloudflare_free_user@gmail.com"
-API_KEY="abcdfhuehjfoiejf9283rjo23i3"

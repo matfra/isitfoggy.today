@@ -3,5 +3,5 @@
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
-#Update DNS entry with Cloudflare in case our public IP change
-01 3	* * * 	isitfoggy 	/opt/isitfoggy/utils/update_dns.sh
+#Update DNS entry with Cloudflare in case our public IP change ever hour
+11 *	* * * 	isitfoggy 	/opt/isitfoggy/utils/update_dns.sh

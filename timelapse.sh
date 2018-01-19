@@ -1,8 +1,7 @@
 #!/bin/bash -ex
+CONFIG_FILE=/etc/isitfoggy.conf
+source $CONFIG_FILE
 
-TIMELAPSE_FRAMERATE=24
-PIC_DIR="/var/lib/isitfoggy/photos"
-PIC_DIR_SIZE=20000000
 FTP_HOST="192.168.31.1"
 FTP_USER="anonymous"
 FTP_PASS="blah"

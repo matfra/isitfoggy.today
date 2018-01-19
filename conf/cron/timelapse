@@ -4,4 +4,4 @@ SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 # One triggers the timelapse build every night at 1.04AM
-01 4	* * *	isitfoggy	/opt/isitfoggy/timelapse.sh
+04 1	* * *	isitfoggy	/usr/share/isitfoggy/timelapse.sh

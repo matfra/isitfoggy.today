@@ -1,0 +1,66 @@
+##
+# JSON log format compatible with Splunk
+log_format main 'site="$server_name" server="$host" dest_port="$server_port" dest_ip="$server_addr" '
+                   'src="$remote_addr" src_ip="$realip_remote_addr" user="$remote_user" '
+                   'time_local="$time_local" protocol="$server_protocol" status="$status" '
+                   'bytes_out="$body_bytes_sent" bytes_in="$upstream_response_length" '
+                   'http_referer="$http_referer" http_user_agent="$http_user_agent" '
+                   'nginx_version="$nginx_version" http_x_forwarded_for="$http_x_forwarded_for" '
+                   'http_x_header="$http_x_header" uri_query="$query_string" uri_path="$uri" '
+                   'http_method="$request_method" response_time="$upstream_response_time" '
+                   'cookie="$http_cookie" request_time="$request_time" ';
+
+access_log /var/log/nginx/isitfoggy.access.log main;
+
+server {
+	listen 80;
+	listen [::]:80;
+    server_name isitfoggy.today zero.isitfoggy.today;
+	
+	root /usr/share/isitfoggy/html;
+	
+	
+	location ~ (\.action$|\.php$|\.cgi|sinkhole\.html|status) {
+		try_files /sinkhole.html =404;
+	}
+	
+
+	location / {
+		return 301 https://$host$request_uri;
+	}
+}
+
+server {
+	# SSL configuration
+	#
+	listen 443 ssl;
+	listen [::]:443 ssl;
+
+	ssl_certificate /etc/letsencrypt/live/zero.isitfoggy.today/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/zero.isitfoggy.today/privkey.pem;
+
+	root /usr/share/isitfoggy/html;
+
+	index index.html index.htm index.nginx-debian.html;
+
+    server_name isitfoggy.today zero.isitfoggy.today;
+
+	location ~ (\.action$|\.php$|\.cgi|sinkhole\.html|status) {
+		try_files /sinkhole.html =404;
+	}
+
+    location /photos {
+        autoindex on;
+    }
+
+    location /test {
+        autoindex on;
+    }
+
+	location / {
+		# First attempt to serve request as file, then
+		# as directory, then fall back to displaying a 404.
+		try_files $uri $uri/ =404;
+	}
+
+}
