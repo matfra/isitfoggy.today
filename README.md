@@ -53,7 +53,7 @@ cd /opt/isitfoggy
 
 Edit the configuration file
 ```shell
-cp conf/isitfoggy.example conf/isitfoggy.conf
+cp conf/isitfoggy.conf.example conf/isitfoggy.conf
 vim conf/isitfoggy.conf
 ```
 
