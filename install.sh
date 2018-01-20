@@ -3,7 +3,7 @@ SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 
 useradd -d /opt/isitfoggy -m -G video -s /bin/nologin isitfoggy
-DIRLIST="/var/log/isitfoggy /usr/share/isitfoggy /var/lib/isitfoggy /var/tmp/isitfoggy"
+DIRLIST="/var/log/isitfoggy /usr/share/isitfoggy /var/lib/isitfoggy /var/tmp/isitfoggy /var/lib/isitfoggy/photos"
 
 for d in $DIRLIST ; do
     echo $d
