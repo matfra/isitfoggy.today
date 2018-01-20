@@ -1,16 +1,22 @@
 #!/bin/bash
 # This file get sourced
 
-TIMELAPSE_FRAMERATE=24
-PIC_DIR=/var/lib/isitfoggy/photos
+#Required by install.sh, snap.sh and timelapse.sh
+
+#The picture directory can be big, you may want to put it on a sperate volume
+PIC_DIR="/var/lib/isitfoggy/photos"
 PIC_DIR_SIZE=20000000
 LOG_DIR="/var/log/isitfoggy"
 TMP_DIR="/var/tmp/isitfoggy"
+TIMELAPSE_FRAMERATE=24
 
-#Required by update_dns.sh
+
+#Required by update_dns.sh and certbot
 
 #This is a DNS entry that point directly to your host
-HOST_TO_PROBE="mynotsosecretserver.isitfoggy.today"
-DOMAIN="location.isitfoggy.today"
+PUBLIC_DOMAIN="isitfoggy.today"
+PUBLIC_FQDN="twinpeaks.isitfoggy.today"
+ORIGIN_FQDN="zero.isitfoggy.today"
+CLOUDFLARE_DNS_SERVER="zelda.ns.cloudflare.com"
 CLOUDFLARE_EMAIL="me@example.com"
 CLOUDFLARE_API_KEY="foiewqhjfoefu98323n2oiu328"
