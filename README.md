@@ -37,7 +37,7 @@ To setup your own DNS entry and SSL cert
 Create the isitfoggy user and home directories
 ```bash
 sudo useradd -d /opt/isitfoggy -m -G video -s /bin/nologin isitfoggy
-sudo chown -R g+w /opt/isitfoggy
+sudo chmod -R g+w /opt/isitfoggy
 ```
 
 Add yourself to the isitfoggy group so you can write stuff in that dir
@@ -53,7 +53,7 @@ cd /opt/isitfoggy
 
 Edit the configuration file
 ```shell
-cp conf/isitfoggy.example conf/isitfoggy.conf
+cp conf/isitfoggy.conf.example conf/isitfoggy.conf
 vim conf/isitfoggy.conf
 ```
 
