@@ -58,5 +58,5 @@ ln -sf $yesterday_dir/timelapse.mp4 $PIC_DIR/latest.mp4
 
 echo "Timelapse complete. Waiting 100 seconds before preloading it into cloudflare cache"
 sleep 100
-curl "https://isitfoggy.today/photos/latest.mp4?$(( ( ( $(date +%s) / 3600) -11)/24 ))" -o /dev/null
+curl "https://${HOST_TO_PROBE}/photos/latest.mp4?$(( ( ( $(date +%s) / 3600) -11)/24 ))" -o /dev/null
 
