@@ -49,7 +49,7 @@ function capture() {
     outfile=$1
     light=$2
     ss_flag=$(get_shutter_speed $2)
-    raspistill -sh 100 -ISO 100 -co 15 $ss_flag -sa 7 -w 1920 -h 1080 -roi 0,0.17,0.80,1 -n -a 12 -th none -q 16 -o $outfile
+    raspistill ${CAPTURE_OPTIONS}
 }
 
 function test_dir_write() {
