@@ -20,3 +20,5 @@ ORIGIN_FQDN="zero.isitfoggy.today"
 CLOUDFLARE_DNS_SERVER="zelda.ns.cloudflare.com"
 CLOUDFLARE_EMAIL="me@example.com"
 CLOUDFLARE_API_KEY="foiewqhjfoefu98323n2oiu328"
+
+CAPTURE_OPTIONS="-sh 100 -ISO 100 -co 15 ${ss_flag} -sa 7 -w 1920 -h 1080 -roi 0,0.17,0.80,1 -n -a 12 -th none -q 16 -o ${outfile}"
