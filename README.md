@@ -62,6 +62,13 @@ Run the installer that will create a bunch of symlinks, services and stuff
 sudo ./install.sh
 ```
 
+### Cloudflare setup
+If you are serving this via your home broadband connection, It's highly recommended that you use a CDN to cache the static content.
+Once you bought a domain (via gandi.net or godaddy.com for example) you can use Cloudflare manage it.
+Cloudflare provide "protection" for your server but also caching. That means videosfor free to protect your server and cache your content.
+Users will send requests to publichostname.yourdomain.com and Cloudflare will send you the requests to privatename.yourdomain.com
+After you transfer your domain to Cloudflare, create the first A record for you public and private fqdn (full qualified domain names)
+And get an API key (in your profile section). Fill all this information in /etc/isitfoggy.conf and run utils/update_dns.sh
 
 
 ## TO-DO:

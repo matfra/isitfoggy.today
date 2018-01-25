@@ -12,7 +12,8 @@ function get_zone_id() {
          -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
          -H "X-Auth-Key: $CLOUDFLARE_API_KEY" \
          -H "Content-Type: application/json")
-    zone_id=$(echo "$result" | jq -r '.result | map(select(.name == "${PUBLIC_DOMAIN}"))[].id')
+    jq_query=".result | map(select(.name == \"${PUBLIC_DOMAIN}\"))[].id"
+    zone_id=$(echo "$result" | jq -r "$jq_query")
     echo $zone_id
 }
 
