@@ -36,8 +36,13 @@ function get_shutter_speed() {
 
 function get_snap_interval() {
     percent_light=$1
-    [[ $percent_light -lt 86 ]] && [[ $percent_light -gt 5 ]] && echo 10 && return 0
-    echo 100 && return 0
+    # We want to take more picture during the day than during the night.
+    # We want to take even more pictures during sunset and sunrise to make beautiful timelapses.
+    [[ $percent_light -lt 6 ]] && echo 120 && return 0  #night
+    [[ $percent_light -lt 10 ]] && echo 10 && return 0  #twilight
+    [[ $percent_light -lt 76 ]] && echo 6 && return 0   #sunrise / sunset
+    [[ $percent_light -lt 86 ]] && echo 10 && return 0  #almost full day
+    echo 50 && return 0 #full day
 }
 
 function purge_oldest_day_in_dir() {
