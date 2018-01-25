@@ -24,7 +24,11 @@ Please install the following dependencies:
 
 To take pictures
 - python
+- imagemagick
+
+To generate the timelapse
 - ffmpeg (If you want HW accelaration on Raspberry Pi: you can build it via the script provided in utils/)
+- libomxil-bellagio-dev (If using Raspberry Pi acceleration)
 
 To serve the site:
 - nginx
@@ -33,6 +37,7 @@ To setup your own DNS entry and SSL cert
 - certbot
 - curl
 - jq
+- dnsutils
 
 Create the isitfoggy user and home directories
 ```bash
