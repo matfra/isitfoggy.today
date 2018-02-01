@@ -3,6 +3,10 @@
 # Update the cloudflare DNS entry to match the public IP address
 # Requires curl, jq, dig(dnsutils)
 
+dig -v 2>/dev/null ; [[ $? == 127 ]] && echo "Error: You need dnsutils to use this tool" && exit 1
+curl -V 2>/dev/null ; [[ $? == 127 ]] && echo "Error: You need curl to use this tool" && exit 1
+jq -V 2>/dev/null ; [[ $? == 127 ]] && echo "Error: You need jq to use this tool" && exit 1
+
 CONFIG_FILE="/etc/isitfoggy.conf"
 source $CONFIG_FILE
 
@@ -12,7 +16,8 @@ function get_zone_id() {
          -H "X-Auth-Email: $CLOUDFLARE_EMAIL" \
          -H "X-Auth-Key: $CLOUDFLARE_API_KEY" \
          -H "Content-Type: application/json")
-    zone_id=$(echo "$result" | jq -r '.result | map(select(.name == "${PUBLIC_DOMAIN}"))[].id')
+    jq_query=".result | map(select(.name == \"${PUBLIC_DOMAIN}\"))[].id"
+    zone_id=$(echo "$result" | jq -r "$jq_query")
     echo $zone_id
 }
 
@@ -62,10 +67,11 @@ else
     echo "A record is already correct"
 fi
 
-if ! [[ "$my_ipv6" == "$my_current_aaaa_record" ]] ; then
-	echo "AAAA record is incorrect: Updating"
-	update_record AAAA $my_ipv6
-else
-    echo "AAAA record is already correct"
+if ! [[ -z $IPV6_ENABLED ]] ; then
+    if ! [[ "$my_ipv6" == "$my_current_aaaa_record" ]] ; then
+    	echo "AAAA record is incorrect: Updating"
+    	update_record AAAA $my_ipv6
+    else
+        echo "AAAA record is already correct"
+    fi
 fi
-
