@@ -31,7 +31,7 @@ function get_light() {
 function get_shutter_speed() {
     percent_light=$1
     [[ $percent_light -gt 86 ]] && return 0
-    python -c "print('-ss %d'%int(3000000*2.71828**(-${percent_light}/18.518)))"
+    echo $percent_light | perl -lne '$a=int(3000000*(5**(-$_/27))) ; print "-ss $a"'
 }
 
 function get_snap_interval() {
@@ -68,6 +68,12 @@ function test_dir_write() {
     fi
 }
 
+function create_thumbnail() {
+    convert -resize 960x540 $1 - > $2
+}
+
+
+
 while true; do
 	check_config
 	source $CONFIG_FILE
@@ -90,6 +96,7 @@ while true; do
 	new_file_path=$PIC_DIR/$cur_date/$cur_time.jpg
 	cp $TMP_PIC_PATH $PIC_DIR/$cur_date/$cur_time.jpg
 	ln -sf $new_file_path $PIC_DIR/latest.jpg
-	echo "Sleeping"
+	create_thumbnail $PIC_DIR/latest.jpg $PIC_DIR/latest_th.jpg
+    echo "Sleeping"
 	sleep $snap_interval
 done
