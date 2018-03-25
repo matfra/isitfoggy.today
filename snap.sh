@@ -22,7 +22,7 @@ function log() {
 
 
 function get_light() {
-    raspistill -sh -100 -ISO 100 -drc off -awb sun -ss 100000 -w 160 -h 90 -roi 0.3,0.30,0.5,0.4 -o $MEASURE_FILE
+    raspistill $(eval echo ${LIGHT_MEASURE_OPTIONS-sh -100 -ISO 100 -drc off -awb sun -ss 100000 -w 160 -h 90 -o $MEASURE_FILE})
     percent_light=$(convert $MEASURE_FILE -resize 1x1 txt: |perl -n -e'/\((\d{1,}),(\d{1,}),(\d{1,})\)$/ && print int(100 * ($3 / 255))')
     log "percent_blue_light: $percent_light"
     echo $percent_light
@@ -31,7 +31,7 @@ function get_light() {
 function get_shutter_speed() {
     percent_light=$1
     [[ $percent_light -gt 86 ]] && return 0
-    echo $percent_light | perl -lne '$a=int(3000000*(5**(-$_/27))) ; print "-ss $a"'
+    echo $percent_light | perl -lne '$a=int(4000000*(5**(-$_/27))) ; print "-ss $a"'
 }
 
 function get_snap_interval() {
@@ -56,7 +56,7 @@ function capture() {
     outfile=$1
     light=$2
     ss_flag=$(get_shutter_speed $2)
-    raspistill $(eval echo ${CAPTURE_OPTIONS--sh 100 -ISO 100 -co 15 $ss_flag -sa 7 -w 1920 -h 1080 -roi 0,0.17,0.80,1 -n -a 12 -th none -q 16 -o $outfile})
+    raspistill $(eval echo ${CAPTURE_OPTIONS--sh 100 -ISO 100 -co 15 $ss_flag -sa 7 -w 1620 -h 1080 -n -a 12 -th none -q 16 -o $outfile})
 }
 
 function test_dir_write() {
@@ -69,7 +69,7 @@ function test_dir_write() {
 }
 
 function create_thumbnail() {
-    convert -resize 960x540 $1 - > $2
+    convert -resize 600x400 $1 - > $2
 }
 
 

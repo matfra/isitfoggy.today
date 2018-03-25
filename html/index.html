@@ -178,8 +178,12 @@
                         <td class="exif-value" id="exif-exposure-time"></td>
                     </tr>
                     <tr>
-                        <td class="exif-tag">F Number</td>
+                        <td class="exif-tag">F</td>
                         <td class="exif-value" id="exif-f-number"></td>
+                    </tr>
+                    <tr>
+                        <td class="exif-tag">Light</td>
+                        <td class="exif-value" id="exif-measured-light"></td>
                     </tr>
                     <tr>
                         <td class="exif-tag">ISO</td>
@@ -195,6 +199,7 @@
         var exifModel = document.getElementById('exif-model');
         var exifExposureTime = document.getElementById('exif-exposure-time');
         var exifFNumber = document.getElementById('exif-f-number');
+        var exifMeasuredLight = document.getElementById('exif-measured-light');
         var exifISOSpeedRating = document.getElementById('exif-iso-speed-rating');
         var exifInfoModal = document.getElementById('exif-info-modal');
 
@@ -211,8 +216,9 @@
                     exifMake.innerHTML = EXIF.getTag(this, "Make");
                     exifModel.innerHTML = EXIF.getTag(this, "Model");
                     exifFNumber.innerHTML = EXIF.getTag(this, "FNumber");
+                    exifMeasuredLight.innerHTML = EXIF.getTag(this, "SpectralSensitivity") + ' %';
                     exifISOSpeedRating.innerHTML = EXIF.getTag(this, "ISOSpeedRatings");
-                    exifExposureTime.innerHTML = parseFloat(EXIF.getTag(this, "ExposureTime")).toFixed(2) + 's';
+                    exifExposureTime.innerHTML = parseFloat(EXIF.getTag(this, "ExposureTime")).toFixed(4) + 's';
                 });
             }
 

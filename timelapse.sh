@@ -51,7 +51,7 @@ done
 
 for i in $(find $yesterday_dir -type f -name '*.jpg' |sort -n) ; do echo "file '$i'" ; done > $PIC_DIR/timelapse.txt
 
-nice -n 10 /usr/local/bin/ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v h264_omx -b:v 12M -vf fps=24 $yesterday_dir/timelapse.mp4 && \
+nice -n 10 /usr/local/bin/ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v h264_omx -b:v 8M -vf fps=48 $yesterday_dir/timelapse.mp4 && \
 ln -sf $yesterday_dir/timelapse.mp4 $PIC_DIR/latest.mp4
 
 [[ -z $FTP_HOST ]] || send_to_ftp
