@@ -25,13 +25,15 @@ function get_light() {
     raspistill $(eval echo ${LIGHT_MEASURE_OPTIONS-sh -100 -ISO 100 -drc off -awb sun -ss 100000 -w 160 -h 90 -o $MEASURE_FILE})
     percent_light=$(convert $MEASURE_FILE -resize 1x1 txt: |perl -n -e'/\((\d{1,}),(\d{1,}),(\d{1,})\)$/ && print int(100 * ($3 / 255))')
     log "percent_blue_light: $percent_light"
+    [[ $percent_light == 0 ]] && echo 99 && return 0
     echo $percent_light
 }
 
 function get_shutter_speed() {
     percent_light=$1
-    [[ $percent_light -gt 86 ]] && return 0
-    echo $percent_light | perl -lne '$a=int(4000000*(5**(-$_/27))) ; print "-ss $a"'
+    [[ $percent_light -gt 89 ]] && return 0
+    [[ $percent_light -gt 54 ]] && echo $percent_light | perl -lne '$a=int(22000+3910000*2.718**(-$_/17.42)) ; print "-ss $a"' && return 0
+    echo $percent_light | perl -lne '$a=int(180000+3810000*2.718**(-$_/12.5)) ; print "-ss $a"'
 }
 
 function get_snap_interval() {
@@ -39,9 +41,7 @@ function get_snap_interval() {
     # We want to take more picture during the day than during the night.
     # We want to take even more pictures during sunset and sunrise to make beautiful timelapses.
     [[ $percent_light -lt 6 ]] && echo 120 && return 0  #night
-    [[ $percent_light -lt 10 ]] && echo 10 && return 0  #twilight
-    [[ $percent_light -lt 76 ]] && echo 6 && return 0   #sunrise / sunset
-    [[ $percent_light -lt 86 ]] && echo 10 && return 0  #almost full day
+    [[ $percent_light -lt 89 ]] && echo 3 && return 0  #sunrise/sunset
     echo 50 && return 0 #full day
 }
 

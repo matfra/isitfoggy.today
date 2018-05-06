@@ -2,11 +2,6 @@
 CONFIG_FILE=/etc/isitfoggy.conf
 source $CONFIG_FILE
 
-FTP_HOST="192.168.31.1"
-FTP_USER="anonymous"
-FTP_PASS="blah"
-FTP_REMOTE_DIR="USB3/isitfoggy_timelapse"
-
 function is_dir_bigger_than() {
 	dir=$1
 	limit=$2
@@ -51,12 +46,12 @@ done
 
 for i in $(find $yesterday_dir -type f -name '*.jpg' |sort -n) ; do echo "file '$i'" ; done > $PIC_DIR/timelapse.txt
 
-nice -n 10 /usr/local/bin/ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v h264_omx -b:v 8M -vf fps=48 $yesterday_dir/timelapse.mp4 && \
+nice -n 10 /usr/local/bin/ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v h264_omx -b:v 8M -vf fps=24 $yesterday_dir/timelapse.mp4 && \
 ln -sf $yesterday_dir/timelapse.mp4 $PIC_DIR/latest.mp4
 
 [[ -z $FTP_HOST ]] || send_to_ftp
 
-echo "Timelapse complete. Waiting 100 seconds before preloading it into cloudflare cache"
-sleep 100
+echo "Timelapse complete. Preloading it into cloudflare cache"
+sleep 1
 curl "https://isitfoggy.today/photos/latest.mp4?$(( ( ( $(date +%s) / 3600) -11)/24 ))" -o /dev/null
 
