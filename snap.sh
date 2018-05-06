@@ -1,30 +1,30 @@
 #!/bin/bash
 set -euxo pipefail
 
-source $(dirname $0)/common.sh
+source $(dirname $(readlink -f $0))/common.sh
 
 function get_light() {
-    raspistill $(eval echo ${LIGHT_MEASURE_OPTIONS-sh -100 -ISO 100 -drc off -awb sun -ss 100000 -w 160 -h 90 -o $MEASURE_FILE})
-    percent_light=$(convert $MEASURE_FILE -resize 1x1 txt: |perl -n -e'/\((\d{1,}),(\d{1,}),(\d{1,})\)$/ && print int(100 * ($3 / 255))')
-    log "percent_blue_light: $percent_light"
-    [[ $percent_light == 0 ]] && echo 99 && return 0
-    echo $percent_light
+    raspistill $(eval echo ${LIGHT_MEASURE_OPTIONS-ISO 100 -drc off -awb sun -ss 1000 -w 160 -h 90 -o $MEASURE_FILE})
+    light_values=$(convert $MEASURE_FILE -resize 1x1 txt: |tail -1 |cut -d "(" -f2 |cut -d ")" -f1)
+    log $light_values
+    echo $light_values |grep -q 65535 && echo 65535 && return 0 
+    echo $light_values | cut -d ',' -f3
 }
 
 function get_shutter_speed() {
-    percent_light=$1
-    [[ $percent_light -gt 89 ]] && return 0
-    [[ $percent_light -gt 54 ]] && echo $percent_light | perl -lne '$a=int(22000+3910000*2.718**(-$_/17.42)) ; print "-ss $a"' && return 0
-    echo $percent_light | perl -lne '$a=int(180000+3810000*2.718**(-$_/12.5)) ; print "-ss $a"'
+    blue_light=$1
+    [[ $blue_light -gt 60000 ]] && echo "-awb auto -ex auto" && return 0
+    [[ $blue_light -gt 40000 ]] && echo $blue_light | perl -lne '$a=int(22000+3810000*2.718**(-0.0000834 * $_)) ; print "-ss $a"' && return 0
+    echo $blue_light | perl -lne '$a=int(180000+3810000*2.718**(-0.0000834 * $_)) ; print "-ss $a"'
 }
 
 function get_snap_interval() {
-    percent_light=$1
+    blue_light=$1
     # We want to take more picture during the day than during the night.
     # We want to take even more pictures during sunset and sunrise to make beautiful timelapses.
-    [[ $percent_light -lt 6 ]] && echo 120 && return 0  #night
-    [[ $percent_light -lt 89 ]] && echo 3 && return 0  #sunrise/sunset
-    echo 50 && return 0 #full day
+    [[ $blue_light -lt 4000 ]] && echo 60 && return 0  #night
+    [[ $blue_light -lt 65000 ]] && echo 1 && return 0  #sunrise/sunset
+    echo 25 && return 0 #full day
 }
 
 function capture() {
@@ -35,7 +35,7 @@ function capture() {
 }
 
 function create_thumbnail() {
-    convert -resize 600x400 $1 - > $2
+    convert -resize 320x175 $1 - > $2
 }
 
 

@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 FFMPEG_SRC_DIR=/tmp/FFmpeg
-
+BRANCH=master
 case $(uname -m) in 
 armv6l)
     ARCH=armel
@@ -18,6 +18,7 @@ esac
 sudo apt-get update
 sudo \
 apt-get -y install \
+libomxil-bellagio-dev \
 git \
 autoconf \
 automake \
@@ -43,14 +44,15 @@ mkdir -p $FFMPEG_SRC_DIR
 cd $FFMPEG_SRC_DIR
 
 if ! [[ -d $FFMPEG_SRC_DIR/.git ]] ; then
-    git clone https://github.com/FFmpeg/FFmpeg.git --depth=1 --branch master --single-branch .
+    git clone https://github.com/FFmpeg/FFmpeg.git --depth=1 --branch $BRANCH --single-branch .
 else
     git status
-    git checkout master
-    git pull origin master
+    git fetch origin $BRANCH
+    git checkout $BRANCH
+    git pull origin HEAD
     make clean
 fi
 
-./configure --arch=$ARCH --target-os=linux --enable-gpl --enable-omx --enable-omx-rpi --enable-nonfree --enable-mmal 
-make -j $(nproc --all)
+nice 10 ./configure --arch=$ARCH --target-os=linux --enable-gpl --enable-omx --enable-omx-rpi --enable-nonfree --enable-mmal 
+nice 10 make -j $(nproc --all)
 sudo make install 

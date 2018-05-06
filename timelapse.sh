@@ -1,6 +1,7 @@
 #!/bin/bash -ex
 
-source $(dirname $0)/common.sh
+source $(dirname $(readlink -f $0))/common.sh
+pre_flight_checks
 
 function send_to_ftp() {
     ftp -n $FTP_HOST <<END_SCRIPT
@@ -21,16 +22,15 @@ echo "Today's dir: $today_dir"
 echo "Yesterday  : $yesterday_dir"
 
 if [[ "$today_dir" == "$yesterday_dir" ]] ; then
-	echo "Not creating a timelapse as $cur_date is not over"
+	log "Not creating a timelapse as $cur_date is not over"
 	exit 1
 fi
 
-pre_flight_checks
 
 for i in $(find $yesterday_dir -type f -name '*.jpg' |sort -n) ; do echo "file '$i'" ; done > $PIC_DIR/timelapse.txt
 
-nice -n 10 /usr/local/bin/ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v h264_omx -b:v 8M -vf fps=24 $yesterday_dir/timelapse.mp4 && \
-ln -sf $yesterday_dir/timelapse.mp4 $PIC_DIR/latest.mp4 && \
+nice -n 10 ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v h264_omx -b:v 12M -s 1920x1080 -vf fps=24 $yesterday_dir/timelapse.mp4
+ln -sf $yesterday_dir/timelapse.mp4 $PIC_DIR/latest.mp4
 archive_dir $yesterday_dir 30
 
 [[ -z $FTP_HOST ]] || send_to_ftp

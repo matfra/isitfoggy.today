@@ -49,7 +49,7 @@ function archive_dir() {
     [[ -d $1 ]] || return 1
     [[ -f $1/archived ]] && return 2
     for f in $(find $1 -type f -name '*.jpg' |sort -n); do
-        let counter++
+	counter=$(( $counter + 1 ))
         [[ $(( $counter % $archiving_ratio )) == 0 ]] && continue
         rm -f $f
     done

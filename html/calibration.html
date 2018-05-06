@@ -18,8 +18,8 @@
                 width: 100%;
                 height: 100%;
                 background-position: top;
-                background-image: url(/landing.jpg);
-                background-size: 100% auto;
+                background-image: url(/photos/loading.jpg);
+                background-size: auto;
                 background-repeat: no-repeat;
             }
             .icon {
@@ -223,9 +223,9 @@
                 });
             }
 
-            var timestamp = Math.floor(Date.now()/(1000*60));
+            var timestamp = Math.floor(Date.now()/(1000));
 
-            newPicture.src = '/photos/latest.jpg?' + timestamp;
+            newPicture.src = '/photos/test/test.jpg?' + timestamp;
             downloadLink.href = newPicture.src;
             downloadLink.download = 'isitfoggy-' + Math.floor(Date.now()/1000);
         }
@@ -263,10 +263,10 @@
         }
 
         window.onload = function() {
-            var timestamp = Math.floor(new Date().getTime()/(1000*60));
+            var timestamp = Math.floor(new Date().getTime()/(1000));
 
             refresh();
-            setInterval(refresh, 1000 * 60);
+            setInterval(refresh, 3000);
 
             if (!isMobile()) {
                 bindIconedLinkHoverEvent('timelapse');

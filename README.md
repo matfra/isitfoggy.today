@@ -39,6 +39,11 @@ To setup your own DNS entry and SSL cert
 - jq
 - dnsutils
 
+```bash
+sudo apt-get update
+sudo apt install -y nginx python imagemagick dnsutils jq curl certbot
+```
+
 Create the isitfoggy user and home directories
 ```bash
 sudo useradd -d /opt/isitfoggy -m -G video -s /bin/nologin isitfoggy
@@ -52,8 +57,8 @@ sudo usermod -G isitfoggy -a $USER
 
 Clone the repo and launch the install script
 ```bash
-git clone git@github.com:matfra/isitfoggy.today.git /opt/isitfoggy
-cd /opt/isitfoggy
+git clone git@github.com:matfra/isitfoggy.today.git /opt/isitfoggy/isitfoggy.today
+cd /opt/isitfoggy/isitfoggy.today
 ```
 
 Edit the configuration file
