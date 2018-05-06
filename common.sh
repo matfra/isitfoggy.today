@@ -46,12 +46,14 @@ function archive_dir() {
 # Takes a directory as a first argument and a int as a second arg. One picture in $2 will be kept.
     counter=0
     [[ -z $2 ]] && archiving_ratio=30 || archiving_ratio=$2 # By default, keep 1 file every 30
-
+    [[ -d $1 ]] || return 1
+    [[ -f $1/archived ]] && return 2
     for f in $(find $1 -type f -name '*.jpg' |sort -n); do
         let counter++
         [[ $(( $counter % $archiving_ratio )) == 0 ]] && continue
         rm -f $f
     done
+    touch $1/archived
 }
 
 
