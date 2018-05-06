@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euxo pipefail
 
-source $(dirname $0)/common.sh
+source $(dirname $(readlink -f $0))/common.sh
 
 function get_light() {
     raspistill $(eval echo ${LIGHT_MEASURE_OPTIONS-sh -100 -ISO 100 -drc off -awb sun -ss 100000 -w 160 -h 90 -o $MEASURE_FILE})

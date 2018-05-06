@@ -15,6 +15,7 @@ for d in $DIRLIST ; do
 done
 
 ln -sf $SCRIPTPATH/conf/systemd/isitfoggy.service /lib/systemd/system/isitfoggy.service
+ln -sf $SCRIPTPATH/common.sh /usr/share/isitfoggy/common.sh
 ln -sf $SCRIPTPATH/snap.sh /usr/share/isitfoggy/snap.sh
 ln -sf $SCRIPTPATH/timelapse.sh /usr/share/isitfoggy/timelapse.sh
 ln -sf $CONFIG_FILE /etc/isitfoggy.conf

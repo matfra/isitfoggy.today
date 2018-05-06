@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-source $(dirname $0)/common.sh
+source $(dirname $(readlink -f $0))/common.sh
 
 function send_to_ftp() {
     ftp -n $FTP_HOST <<END_SCRIPT
