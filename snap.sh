@@ -13,7 +13,7 @@ function get_light() {
 
 function get_shutter_speed() {
     percent_light=$1
-    [[ $percent_light -gt 89 ]] && return 0
+    [[ $percent_light -gt 89 ]] && echo "-awb auto -ex auto" && return 0
     [[ $percent_light -gt 54 ]] && echo $percent_light | perl -lne '$a=int(22000+3910000*2.718**(-$_/17.42)) ; print "-ss $a"' && return 0
     echo $percent_light | perl -lne '$a=int(180000+3810000*2.718**(-$_/12.5)) ; print "-ss $a"'
 }
@@ -35,7 +35,7 @@ function capture() {
 }
 
 function create_thumbnail() {
-    convert -resize 600x400 $1 - > $2
+    convert -resize 320x175 $1 - > $2
 }
 
 
