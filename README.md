@@ -1,15 +1,12 @@
 # isitfoggy.today
 ## Introduction
-This is a simple set of bash scripts and stuff that make a timelapse
-using a raspberry pi camera. It takes a picture every 100 seconds
-during the day and night and every 10 seconds during sunrise/sunset
-
+This uses your Raspberry Pi and its camera to take a bunch of pictures every minutes
+and serves them via a small website.
 At the end of the day, it will generate a timelapse in mp4 format
 
+Example:
 https://isitfoggy.today
 
-
-Everything is viewable via a simple html page
 
 There are configuration files for 
 - nginx
@@ -55,7 +52,7 @@ Add yourself to the isitfoggy group so you can write stuff in that dir
 sudo usermod -G isitfoggy -a $USER
 ```
 Reload your group permissions
-Clone the repo and launch the install script
+Clone the repo and edit the configuration file
 ```bash
 /bin/bash
 git clone git@github.com:matfra/isitfoggy.today.git /opt/isitfoggy/isitfoggy.today
