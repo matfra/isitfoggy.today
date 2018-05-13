@@ -11,7 +11,7 @@ https://isitfoggy.today
 
 Everything is viewable via a simple html page
 
-Configurations for
+There are configuration files for 
 - nginx
 - systemd
 - cloudflare DNS/cache
@@ -20,15 +20,15 @@ Configurations for
 
 ## Installation
 
-Please install the following dependencies:
+Here is the list of the required dependencies
 
 To take pictures
-- python
+- raspistill (should already be installed)
 - imagemagick
 
 To generate the timelapse
-- ffmpeg (If you want HW accelaration on Raspberry Pi: you can build it via the script provided in utils/)
-- libomxil-bellagio-dev (If using Raspberry Pi acceleration)
+- ffmpeg
+- libomxil-bellagio-bin (for GPU accelerated encoding)
 
 To serve the site:
 - nginx
@@ -41,7 +41,7 @@ To setup your own DNS entry and SSL cert
 
 ```bash
 sudo apt-get update
-sudo apt install -y nginx python imagemagick dnsutils jq curl certbot
+sudo apt install -y nginx git ffmpeg libomxil-bellagio-bin imagemagick dnsutils jq curl certbot
 ```
 
 Create the isitfoggy user and home directories
@@ -54,15 +54,16 @@ Add yourself to the isitfoggy group so you can write stuff in that dir
 ```bash
 sudo usermod -G isitfoggy -a $USER
 ```
-
+Reload your group permissions
 Clone the repo and launch the install script
 ```bash
+/bin/bash
 git clone git@github.com:matfra/isitfoggy.today.git /opt/isitfoggy/isitfoggy.today
 cd /opt/isitfoggy/isitfoggy.today
 ```
 
 Edit the configuration file
-```shell
+```bash
 cp conf/isitfoggy.conf.example conf/isitfoggy.conf
 vim conf/isitfoggy.conf
 ```
@@ -70,6 +71,11 @@ vim conf/isitfoggy.conf
 Run the installer that will create a bunch of symlinks, services and stuff
 ```
 sudo ./install.sh
+```
+
+### Getting SSL certificate
+```
+sudo utils/certbot_init.sh
 ```
 
 ### Cloudflare setup
@@ -80,11 +86,15 @@ Users will send requests to publichostname.yourdomain.com and Cloudflare will se
 After you transfer your domain to Cloudflare, create the first A record for you public and private fqdn (full qualified domain names)
 And get an API key (in your profile section). Fill all this information in /etc/isitfoggy.conf and run utils/update_dns.sh
 
+```bash
+cd utils/update_dns.sh
+```
+
+
 
 ## TO-DO:
 ### Frontend
 - Add a javascript realtime fog/visibility analysis
 ### Backend
 - Package everything into a .deb
-- Create a true shared library
 - Allow people to write their own camera wrapper

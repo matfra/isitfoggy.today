@@ -1,5 +1,0 @@
-jq
-python
-curl
-ffmpeg
-nginx
