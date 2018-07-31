@@ -1,0 +1,14 @@
+{
+  "short_name": "twinpeaks",
+  "name": "twinpeaks.isitfoggy.today",
+  "icons": [
+    {
+      "src": "icons/foggy_1f301.png",
+      "sizes": "160x160",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "landscape"
+}
