@@ -15,16 +15,16 @@ function get_shutter_speed() {
     blue_light=$1
     [[ $blue_light -gt 60000 ]] && echo "-awb auto -ex auto" && return 0
     [[ $blue_light -gt 40000 ]] && echo $blue_light | perl -lne '$a=int(3810000*2.718**(-0.0000834 * $_)) ; print "-ss $a"' && return 0
-    echo $blue_light | perl -lne '$a=int(3810000*2.718**(-0.0000834 * $_)) ; print "-ss $a"'
+    echo $blue_light | perl -lne '$a=int(3810000*2.718**(-0.0000834 * $_)) - 45000 ; print "-ss $a"'
 }
 
 function get_snap_interval() {
     blue_light=$1
     # We want to take more picture during the day than during the night.
     # We want to take even more pictures during sunset and sunrise to make beautiful timelapses.
-    [[ $blue_light -lt 4000 ]] && echo 80 && return 0  #night
-    [[ $blue_light -lt 65000 ]] && echo 2 && return 0  #sunrise/sunset
-    echo 40 && return 0 #full day
+    [[ $blue_light -lt 12 ]] && echo 70 && return 0  #night
+    [[ $blue_light -lt 65000 ]] && echo 1 && return 0  #sunrise/sunset
+    echo 45 && return 0 #full day
 }
 
 function capture() {
