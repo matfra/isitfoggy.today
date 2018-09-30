@@ -4,7 +4,7 @@ set -euxo pipefail
 source $(dirname $(readlink -f $0))/common.sh
 
 function get_light() {
-    raspistill $(eval echo ${LIGHT_MEASURE_OPTIONS-ISO 100 -drc off -awb sun -ss 1000 -w 160 -h 90 -o $MEASURE_FILE})
+    raspistill $(eval echo ${LIGHT_MEASURE_OPTIONS--ISO 100 -drc off -awb sun -ss 1000 -w 160 -h 90 -o $MEASURE_FILE})
     light_values=$(convert $MEASURE_FILE -resize 1x1 txt: |tail -1 |cut -d "(" -f2 |cut -d ")" -f1)
     log $light_values
     echo $light_values |grep -q 65535 && echo 65535 && return 0 
