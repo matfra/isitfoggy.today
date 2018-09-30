@@ -53,6 +53,6 @@ else
     make clean
 fi
 
-nice 10 ./configure --arch=$ARCH --target-os=linux --enable-gpl --enable-omx --enable-omx-rpi --enable-nonfree --enable-mmal 
-nice 10 make -j $(nproc --all)
+nice -n 10 ./configure --arch=$ARCH --target-os=linux --enable-gpl --enable-omx --enable-omx-rpi --enable-nonfree --enable-mmal 
+nice -n 10 make -j $(nproc --all)
 sudo make install 
