@@ -35,6 +35,9 @@ systemctl reload nginx.service
 #Setting up cron timelapse
 cp $SCRIPTPATH/conf/cron/timelapse /etc/cron.d/timelapse
 
+#Setup the proper domain name in manifest.json
+sed "s/isitfoggy.com/${PUBLIC_FQDN}/" $SCRIPTPATH/html/manifest.json
+
 if [[ ! -z $TURN_OFF_PIZERO_LED ]] ; then
     # Set the Pi Zero ACT LED trigger to 'none'.
     echo none | sudo tee /sys/class/leds/led0/trigger

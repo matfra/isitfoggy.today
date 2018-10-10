@@ -29,8 +29,8 @@ fi
 
 for i in $(find $yesterday_dir -type f -name '*.jpg' |sort -n) ; do echo "file '$i'" ; done > $PIC_DIR/timelapse.txt
 
-nice -n 10 ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v h264_omx -b:v 5M -s 1920x1080 -vf fps=30 $yesterday_dir/timelapse.mp4
+nice -n 10 ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v h264_omx -b:v 8M -s 1920x1080 -vf fps=24 $yesterday_dir/timelapse.mp4
 ln -sf $yesterday_dir/timelapse.mp4 $PIC_DIR/latest.mp4
-archive_dir $yesterday_dir 30
+archive_dir $yesterday_dir 20
 
 [[ -z $FTP_HOST ]] || send_to_ftp
