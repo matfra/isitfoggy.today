@@ -18,6 +18,7 @@ ln -sf $SCRIPTPATH/conf/systemd/isitfoggy.service /lib/systemd/system/isitfoggy.
 ln -sf $SCRIPTPATH/common.sh /usr/share/isitfoggy/common.sh
 ln -sf $SCRIPTPATH/snap.sh /usr/share/isitfoggy/snap.sh
 ln -sf $SCRIPTPATH/timelapse.sh /usr/share/isitfoggy/timelapse.sh
+ln -sf $SCRIPTPATH/utils/ssim /usr/local/bin/ssim
 ln -sf $CONFIG_FILE /etc/isitfoggy.conf
 
 #Installing as a service

@@ -15,7 +15,7 @@ access_log /var/log/nginx/isitfoggy.access.log main;
 server {
 	listen 80;
 	listen [::]:80;
-    server_name isitfoggy.today zero.isitfoggy.today;
+    server_name isitfoggy.com zero.isitfoggy.com;
 	
 	root /usr/share/isitfoggy/html;
 	
@@ -36,14 +36,14 @@ server {
 	listen 443 ssl;
 	listen [::]:443 ssl;
 
-	ssl_certificate /etc/letsencrypt/live/zero.isitfoggy.today/fullchain.pem;
-	ssl_certificate_key /etc/letsencrypt/live/zero.isitfoggy.today/privkey.pem;
+	ssl_certificate /etc/letsencrypt/live/zero.isitfoggy.com/fullchain.pem;
+	ssl_certificate_key /etc/letsencrypt/live/zero.isitfoggy.com/privkey.pem;
 
 	root /usr/share/isitfoggy/html;
 
 	index index.html index.htm index.nginx-debian.html;
 
-    server_name isitfoggy.today zero.isitfoggy.today;
+    server_name isitfoggy.com zero.isitfoggy.com;
 
 	location ~ (\.action$|\.php$|\.cgi|sinkhole\.html|status) {
 		try_files /sinkhole.html =404;

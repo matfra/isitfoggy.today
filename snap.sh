@@ -11,6 +11,11 @@ function get_light() {
     echo $light_values | cut -d ',' -f3
 }
 
+function get_image_diff() {
+    diff=$(butteraugli $1 $2 || echo 30.0)
+    echo $diff | cut -d '.' -f1
+} 
+
 function get_shutter_speed() {
     blue_light=$1
     [[ $blue_light -gt 60000 ]] && echo "-awb auto -ex auto" && return 0
@@ -31,11 +36,11 @@ function capture() {
     outfile=$1
     light=$2
     ss_flag=$(get_shutter_speed $2)
-    raspistill $(eval echo ${CAPTURE_OPTIONS--sh 100 -ISO 100 -co 15 $ss_flag -sa 7 -w 1620 -h 1080 -n -a 12 -th none -q 16 -o $outfile})
+    raspistill $(eval echo ${CAPTURE_OPTIONS--sh 100 -ISO 100 -co 15 $ss_flag -sa 7 -w 1920 -h 1080 -n -a 12 -th none -q 16 -o $outfile})
 }
 
 function create_thumbnail() {
-    convert -resize 320x175 $1 - > $2
+    convert -resize 320x180 $1 - > $2
 }
 
 
@@ -49,11 +54,13 @@ while true; do
 	cur_time=$(date +%H%M%S)
 	mkdir -p $PIC_DIR/$cur_date
 	percent_light=$(get_light)
+	diff=$(get_image_diff $PIC_DIR/previous_th.jpg $PIC_DIR/latest_th.jpg)
 	snap_interval=$(get_snap_interval $percent_light)
-	capture "$TMP_PIC_PATH" $percent_light
+	capture "$TMP_PIC_PATH" $percent_light $diff
 	new_file_path=$PIC_DIR/$cur_date/$cur_time.jpg
 	cp $TMP_PIC_PATH $PIC_DIR/$cur_date/$cur_time.jpg
 	ln -sf $new_file_path $PIC_DIR/latest.jpg
+	cp $PIC_DIR/latest_th.jpg $PIC_DIR/previous_th.jpg
 	create_thumbnail $PIC_DIR/latest.jpg $PIC_DIR/latest_th.jpg
     echo "Sleeping"
 	sleep $snap_interval
