@@ -95,3 +95,5 @@ cd utils/update_dns.sh
 ### Backend
 - Package everything into a .deb
 - Allow people to write their own camera wrapper
+- Implement zone defined whitebalance
+- Dynamic interval based on changes
