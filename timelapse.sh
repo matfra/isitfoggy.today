@@ -29,7 +29,7 @@ fi
 
 for i in $(find $yesterday_dir -type f -name '*.jpg' |sort -n) ; do echo "file '$i'" ; done > $PIC_DIR/timelapse.txt
 
-nice -n 10 ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v h264_omx -b:v 8M -s 1920x1080 -vf fps=24 $yesterday_dir/timelapse.mp4
+nice -n 10 ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v h264_omx -b:v 20M -s 1920x1080 -vf fps=24 $yesterday_dir/timelapse.mp4
 ln -sf $yesterday_dir/timelapse.mp4 $PIC_DIR/latest.mp4
 
 three_days_ago=$(find $PIC_DIR/ -type d -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" |sort -n |tail -4 |head -1)
