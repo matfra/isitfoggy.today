@@ -8,7 +8,7 @@
         <meta property="og:description" content="Twin Peaks webcam provides timelapse of the city">
         <meta property="og:image" content="https://isitfoggy.com/photos/latest_th.jpg">
 	<meta property="og:image:width" content="320">
-	<meta property="og:image:height" content="175">
+	<meta property="og:image:height" content="180">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<link rel="manifest" href="/manifest.json">
 
@@ -38,6 +38,10 @@
 
             .timelapse-icon {
                 background-image: url(icons/play-button.svg);
+            }
+
+            .daylight-icon {
+                background-image: url(icons/daylight.png);
             }
 
             .github-icon {
@@ -147,6 +151,10 @@
                     <div class="github-link-help-text iconed-link-help-text">check out the code on github<br></div>
                 </div>
                 <div class="iconed-link-container">
+                    <a class="daylight-link" href="daylight_browser.html"><div class="icon daylight-icon"></div></a>
+                    <div class="daylight-link-help-text iconed-link-help-text">Browse any past photo taken by this camera by sky color<br></div>
+                </div>
+                <div class="iconed-link-container">
                     <a class="download-link" href="/photos/latest.jpg" download="isitfoggy">
                         <div class="icon download-icon"></div>
                     </a>
@@ -190,7 +198,7 @@
                         <td class="exif-value" id="exif-measured-light"></td>
                     </tr>
                     <tr>
-                        <td class="exif-tag">ISO</td>
+                        <td class="exif-tag">Light</td>
                         <td class="exif-value" id="exif-iso-speed-rating"></td>
                     </tr>
                 </table>

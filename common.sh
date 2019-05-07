@@ -7,6 +7,15 @@ function check_config() {
     return 0
 }
 
+function check_binaries() {
+	for i in cjpeg djpeg exif convert raspistill ; do
+		if ! which $i >/dev/null ; then
+			echo "Could not find the binary $i, aborting"
+			exit 1
+		fi
+	done
+}
+
 function is_dir_bigger_than() {
     dir=$1
     limit=$2
@@ -28,6 +37,7 @@ function purge_oldest_day_in_dir() {
 }
 
 function test_dir_write() {
+    test -d $1 || mkdir -p $1 
     if ! touch $1/write_test ; then
         echo "Cannot write in $1. Exiting"
         exit 1
@@ -58,6 +68,7 @@ function archive_dir() {
 
 
 function pre_flight_checks() {
+	check_binaries
 	check_config
 	source $CONFIG_FILE
 	test_dir_write $PIC_DIR
