@@ -51,11 +51,10 @@ Add yourself to the isitfoggy group so you can write stuff in that dir
 ```bash
 sudo usermod -G isitfoggy -a $USER
 ```
-Reload your group permissions
+Logout and log in to get the new group ownership
 Clone the repo and edit the configuration file
 ```bash
-/bin/bash
-git clone git@github.com:matfra/isitfoggy.today.git /opt/isitfoggy/isitfoggy.today
+git clone https://github.com:matfra/isitfoggy.today.git /opt/isitfoggy/isitfoggy.today
 cd /opt/isitfoggy/isitfoggy.today
 ```
 
