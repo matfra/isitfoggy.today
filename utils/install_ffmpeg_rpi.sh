@@ -50,9 +50,9 @@ else
     git fetch origin $BRANCH
     git checkout $BRANCH
     git pull origin HEAD
-    make clean
+    make clean || true
 fi
 
-nice 10 ./configure --arch=$ARCH --target-os=linux --enable-gpl --enable-omx --enable-omx-rpi --enable-nonfree --enable-mmal --enable-libaom
-nice 10 make -j $(nproc --all)
-echo sudo make install 
+nice -n 10 ./configure --arch=$ARCH --target-os=linux --enable-gpl --enable-omx --enable-omx-rpi --enable-nonfree --enable-mmal 
+nice -n 10 make -j $(nproc --all)
+sudo make install 
