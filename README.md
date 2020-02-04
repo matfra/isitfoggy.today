@@ -5,7 +5,7 @@ and serves them via a small website.
 At the end of the day, it will generate a timelapse in mp4 format
 
 Example:
-https://isitfoggy.today
+https://isitfoggy.com
 
 
 There are configuration files for 
@@ -95,4 +95,3 @@ cd utils/update_dns.sh
 - Package everything into a .deb
 - Allow people to write their own camera wrapper
 - Implement zone defined whitebalance
-- Dynamic interval based on changes
