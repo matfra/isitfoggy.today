@@ -2,6 +2,7 @@
 
 source $(dirname $(readlink -f $0))/common.sh
 pre_flight_checks
+LOG_FILE="$LOG_DIR/$(basename $0).log"
 
 function send_to_ftp() {
     ftp -n $FTP_HOST <<END_SCRIPT
@@ -26,12 +27,16 @@ if [[ "$today_dir" == "$yesterday_dir" ]] ; then
 	exit 1
 fi
 
+timelapse_output=$yesterday_dir/timelapse.mp4
 
-for i in $(find $yesterday_dir -type f -name '*.jpg' |sort -n) ; do echo "file '$i'" ; done > $PIC_DIR/timelapse.txt
+if [ -f $timelapse_output ] ; then
+	log "Not creating a timelapse as $timelapse_output already exists"
+else
+	nice -n 10 ffmpeg -framerate 30 -pattern_type glob -i "$yesterday_dir/*.jpg" -c:v h264_omx -b:v 20M -s 1920x1080 $timelapse_output
+	chmod 664 $timelapse_output
+	ln -sf $timelapse_output $PIC_DIR/latest.mp4
 
-nice -n 10 ffmpeg -f concat -safe 0 -i $PIC_DIR/timelapse.txt -c:v h264_omx -b:v 20M -s 1920x1080 -vf fps=24 $yesterday_dir/timelapse.mp4
-chmod 664 $yesterday_dir/timelapse.mp4
-ln -sf $yesterday_dir/timelapse.mp4 $PIC_DIR/latest.mp4
+fi
 
 echo "Running daylight"
 nice -n 10 $(dirname $(readlink -f $0))/daylight.sh -d $yesterday_dir

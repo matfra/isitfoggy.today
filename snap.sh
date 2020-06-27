@@ -26,11 +26,11 @@ function get_shutter_speed() {
 # https://docs.google.com/spreadsheets/d/1-merFoSUlKPvFpYkskaAGFvJg0_1BtaKPWaCKVzcVBM/edit?usp=sharing
     blue_light=$1
 
-    [[ $blue_light -gt 64000 ]] && echo "-drc high" && return 0
+    [[ $blue_light -gt 64000 ]] && echo "-drc low" && return 0
     [[ $blue_light -ge 30000 ]] && echo $blue_light | perl -lne 'printf "-drc high -ss " ;print int(926008-81406*log($_))' && return 0
     [[ $blue_light -ge 5500 ]] && echo $blue_light | perl -lne 'printf "-drc high -ss " ;print int(4.79*1000000-460383*log($_))' && return 0
-    [[ $blue_light -ge 100 ]] && echo $blue_light | perl -lne 'printf "-drc high -ss " ;print int(3.47*1000000*exp(-3.15*0.0001*$_))' && return 0
-    echo "-drc off -ss 3500000" && return 0
+    [[ $blue_light -ge 100 ]] && echo $blue_light | perl -lne 'printf "-drc high -ss " ;print int(3.88*1000000*exp(-3.15*0.0001*$_))' && return 0
+    echo "-drc off -ss 4000000" && return 0
 
 }
 
@@ -48,8 +48,8 @@ function capture() {
     light=$2
     ss_flag=$(get_shutter_speed $2)
     echo -n "Flags: $ss_flag, "
-    awb_flags=""
-    timeout 60 raspistill $(eval echo ${CAPTURE_OPTIONS--sh 100 -ISO 100 -co 15 $ss_flag $awb_flags -sa 7 -w 1920 -h 1080 -n -a 12 -th none -q 16 -o $outfile})
+    awb_flags="" #-awb auto -fli off"
+    timeout 60 raspistill $(eval echo ${CAPTURE_OPTIONS--sh 100 -ISO 100 $ss_flag $awb_flags -sa 7 -w 1920 -h 1080 -n -a 12 -th none -q 16 -o $outfile})
     if [[ $? == 124 ]] ; then
 	echo "Timeout using raspistill. rebooting"
 	sudo shutdown -r 2
