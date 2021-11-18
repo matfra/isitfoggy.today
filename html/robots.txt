@@ -1,5 +1,0 @@
-User-agent: *
-Disallow: *.php
-Disallow: *.cgi
-Disallow: /sinkhole.html
-Disallow: /status
