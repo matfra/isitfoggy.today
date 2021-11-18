@@ -14,10 +14,17 @@ function send_to_ftp() {
 END_SCRIPT
 }
 
+
 cur_date=$(date +%Y-%m-%d)
 today_dir=$PIC_DIR/$cur_date
-yesterday_dir=$(find $PIC_DIR/ -type d -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" |sort -n |tail -2 |head -1)
-yesterday_date=$(basename $yesterday_dir)
+
+if [ -z $1 ] ; then
+	yesterday_dir=$(find $PIC_DIR/ -type d -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" |sort -n |tail -2 |head -1)
+	yesterday_date=$(basename $yesterday_dir)
+else
+	yesterday_date=$1
+	yesterday_dir=$PIC_DIR/$yesterday_date
+fi
 
 echo "Today's dir: $today_dir"
 echo "Yesterday  : $yesterday_dir"

@@ -11,7 +11,7 @@ function get_light() {
 	echo "Timeout using raspistill. rebooting"
 	sudo shutdown -r 2
     fi
-light_values=$(convert $MEASURE_FILE -resize 1x1 txt: |tail -1 |cut -d "(" -f2 |cut -d ")" -f1)
+light_values=$(convert $MEASURE_FILE -resize 1x1 -set colorspace Gray -separate -average txt: |tail -1 |cut -d "(" -f2 |cut -d ")" -f1)
     log $light_values
     echo $light_values |grep -q 65535 && echo 65535 && return 0 
     echo $light_values | cut -d ',' -f3
@@ -28,8 +28,8 @@ function get_shutter_speed() {
 
     [[ $blue_light -gt 64000 ]] && echo "-drc low" && return 0
     [[ $blue_light -ge 30000 ]] && echo $blue_light | perl -lne 'printf "-drc high -ss " ;print int(926008-81406*log($_))' && return 0
-    [[ $blue_light -ge 5500 ]] && echo $blue_light | perl -lne 'printf "-drc high -ss " ;print int(4.79*1000000-460383*log($_))' && return 0
-    [[ $blue_light -ge 100 ]] && echo $blue_light | perl -lne 'printf "-drc high -ss " ;print int(3.88*1000000*exp(-3.15*0.0001*$_))' && return 0
+    [[ $blue_light -ge 5500 ]] && echo $blue_light | perl -lne 'printf "-drc high -ss " ;print int(5.00*1000000-460383*log($_))' && return 0
+    [[ $blue_light -ge 100 ]] && echo $blue_light | perl -lne 'printf "-drc high -ss " ;print int(3.48*1000000*exp(-3.15*0.0001*$_))' && return 0
     echo "-drc off -ss 4000000" && return 0
 
 }

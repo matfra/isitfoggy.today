@@ -96,3 +96,5 @@ cd utils/update_dns.sh
 - Allow people to write their own camera wrapper
 - Implement zone defined whitebalance
 - Dynamic interval based on changes
+### Added data
+TODO: think of an interface to add metadata
