@@ -24,6 +24,12 @@ while [[ $# -gt 0 ]]; do
 		-n | --numdays )	shift
 					numdays=$1
 					;;
+		-y | --year )		shift
+					year="$1"
+					;;
+		-m | --month )		shift
+					month=$1
+					;;
 		-d | --dir )		shift
 					working_dir=$1
 					;;
@@ -104,7 +110,16 @@ function generate_lastndayview() {
 	# Generate the html
 	HTML_DIR=$(dirname $(readlink -f $0))/html
 	HTML_FILE=$TMP_DIR/$file_prefix.html
-	echo "<html><head><title>Daylight for the last $day_count days</title><link rel=\"stylesheet\" href=\"daylight.css\"></head><body>" > $HTML_FILE
+	echo '<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>isitfoggy daylight browser</title>
+    <link rel="stylesheet" href="daylight.css">
+  </head>
+    <body>
+      <div class="top">
+        <div class="bands">' >> $HTML_FILE
 	echo "<img src=\"photos/$file_prefix.png\" usemap=\"#daylight\" width=\"${day_count}\" height=\"1440\">">> $HTML_FILE
 	echo "<map name=\"daylight\">" >> $HTML_FILE
 	x=0
@@ -115,42 +130,140 @@ function generate_lastndayview() {
 		echo "  <area shape=\"rect\" coords=\"$x,0,$((x+1)),1439\" alt=\"$altname\" href=\"$dirlink\">" >> $HTML_FILE
 		x="$((x+1))"
 	done
-	echo '</map><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><script src="lib/jquery.rwdImageMaps.min.js"></script>' >> $HTML_FILE
-	echo "<script>\$(document).ready(function(e) { \$('img[usemap]').rwdImageMaps();});</script></div></body></html>" >> $HTML_FILE
+	echo '</map>     
+      </div>
+      
+      <div class="right">
+          <div class="timeboxeven">12 AM</div>
+          <div class="timeboxodd">1 AM</div>
+  <div class="timeboxeven">2 AM</div>
+  <div class="timeboxodd">3 AM</div>
+  <div class="timeboxeven">4 AM</div>
+  <div class="timeboxodd">5 AM</div>
+  <div class="timeboxeven">6 AM</div>
+  <div class="timeboxodd">7 AM</div>
+  <div class="timeboxeven">8 AM</div>
+  <div class="timeboxodd">9 AM</div>
+  <div class="timeboxeven">10 AM</div>
+  <div class="timeboxodd">11 AM</div>
+  <div class="timeboxeven">12 PM</div>
+  <div class="timeboxodd">1 PM</div>
+  <div class="timeboxeven">2 PM</div>
+  <div class="timeboxodd">3 PM</div>
+  <div class="timeboxeven">4 PM</div>
+  <div class="timeboxodd">5 PM</div>
+  <div class="timeboxeven">6 PM</div>
+  <div class="timeboxodd">7 PM</div>
+  <div class="timeboxeven">8 PM</div>
+  <div class="timeboxodd">9 PM</div>
+  <div class="timeboxeven">10 PM</div>
+  <div class="timeboxodd">11 PM</div>
+  </div>
+  </div>
+  <div class="bottom">Months and years here</div>
+  <script src="lib/jquery.min.js"></script>
+  <script src="lib/jquery.rwdImageMaps.min.js"></script>
+
+    <script>
+    $(document).ready(function(e) { $("img[usemap]").rwdImageMaps();});
+    </script>
+    </body>
+</html>' >> $HTML_FILE
 	mv $HTML_FILE $HTML_DIR/
 		
 }
 
+function generate_black_band() {
+	# Generates a 1x1440px black PNG at the path provided as argument
+	convert -size 1x1440 xc:black "$1"
+}
+		
+function generate_month_band() {
+	# args: year-month
+	
+	#Checks
+	DAYLIGHT_DIR="$PIC_DIR/daylight"
+	[[ -d $DAYLIGHT_DIR ]] || mkdir $DAYLIGHT_DIR
+	empty_day_file="$DAYLIGHT_DIR/black.png"
+	[[ -f $empty_day_file ]] || generate_black_band $empty_day_file
+	result_file="$DAYLIGHT_DIR/$1.png"
+	today=$(date "+%Y-%m-%d")
 
-#TO-DO for V2
-#Create a list of all the years with daylight file
-#Order them from the oldest to the newest
-#Count them by year
-#For every year, if there is a png of the right width, skip
-#If not, generate a png with all the days of the given year
-#Generate a clickable html page
-#Grab the last 365 days and generate a png and html of that
+	filelist=""
+	for day in $(seq 1 31) ; do
+		#Exclude the days that don't exist and add zeros prefixes if needed
+		sanitized_date=$(date -d "${1}-${day}" "+%Y-%m-%d") 2>/dev/null || continue
+		[[ $today == $sanitized_date ]] && break
+		daylight_filepath="$PIC_DIR/$sanitized_date/daylight.png"
+		if test -f $daylight_filepath ; then
+			filelist=$(echo -n "$filelist $daylight_filepath")
+		else
+			filelist=$(echo -n "$filelist $empty_day_file")
+		fi
+	done
 
-#If there is already a png for the 
-#Figure out the year we are are in
-#Generate the png for the last 365 days
-#For every year, if it's the current year
-#Count how many days we have this year
-#If the 
-#If there is no existing png for the current year, create one
-#Generate html with a list box for all the years pngs
+	# actually create the png
+	convert +append $(echo $filelist) -colors 256 $result_file
+}	
+
+function generate_year_band() {
+	# args: year-month
+	
+	#Checks
+	DAYLIGHT_DIR="$PIC_DIR/daylight"
+	[[ -d $DAYLIGHT_DIR ]] || mkdir $DAYLIGHT_DIR
+	empty_day_file="$DAYLIGHT_DIR/black.png"
+	[[ -f $empty_day_file ]] || generate_black_band $empty_day_file
+	result_file="$DAYLIGHT_DIR/$1.png"
+
+	today=$(date "+%Y-%m-%d")
+	filelist=""
+	for month in $(seq 1 12) ; do
+		for day in $(seq 1 31) ; do
+			#Exclude the days that don't exist and add zeros prefixes if needed
+			sanitized_date=$(date -d "${1}-${month}-${day}" "+%Y-%m-%d" 2>/dev/null) || continue
+			[[ $today == $sanitized_date ]] && break
+			daylight_filepath="$PIC_DIR/$sanitized_date/daylight.png"
+			if test -f $daylight_filepath ; then
+				filelist=$(echo -n "$filelist $daylight_filepath")
+			else
+				filelist=$(echo -n "$filelist $empty_day_file")
+			fi
+		done
+		[[ $today == $sanitized_date ]] && break
+	done
+
+	# actually create the png
+	convert +append $(echo $filelist) PNG8:$result_file
+}	
 
 
 #main
+set +u
+if [[ ! -z $year ]] ; then
+	set -u
+	generate_year_band $year
+	exit 0
+fi
+
+if [[ ! -z $month ]] ; then
+	set -u
+	generate_month_band $month
+	exit 0
+fi
+
 if [[ ! -z $numdays ]] ; then
+	set -u
 	generate_lastndayview $numdays
 	exit 0
 fi
 
 if [[ $force == 1 ]] || ! test -f $working_dir/daylight.png ; then
+	set -u
 	generate_daylight $working_dir
 	[[ $? == 0 ]] || exit 1
 fi
-set +e
 
+#default
+set +e
 generate_yearview

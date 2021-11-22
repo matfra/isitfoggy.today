@@ -47,7 +47,7 @@ fi
 
 echo "Running daylight"
 nice -n 10 $(dirname $(readlink -f $0))/daylight.sh -d $yesterday_dir
-
+nice -n 10 $(dirname $(readlink -f $0))/daylight.sh -n 365
 three_days_ago=$(find $PIC_DIR/ -type d -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" |sort -n |tail -4 |head -1)
 archive_dir $three_days_ago 20
 
