@@ -1,9 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-function get_yesterday_dir() {
-	cur_date=$(date +%Y-%m-%d)
-	find $PIC_DIR/ -type d -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" |sort -n |tail -2 |head -1
+function get_last_day() {
+	basename $(find $PIC_DIR/ -type d -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" |sort -n |tail -2 |head -1) 
 }
 
 function usage() {
@@ -14,6 +13,8 @@ function usage() {
 crop_zone="320x200+80+150"
 gravity="North"
 force=0
+
+[[ $# -lt 1 ]] && usage && exit 1
 
 while [[ $# -gt 0 ]]; do
 	case $1 in
@@ -30,8 +31,14 @@ while [[ $# -gt 0 ]]; do
 		-m | --month )		shift
 					month=$1
 					;;
-		-d | --dir )		shift
-					working_dir=$1
+		--from )		shift
+					month_from=$1
+					;;
+		--to )			shift
+					month_to=$1
+					;;
+		-d | --day )		shift
+					day=$1
 					;;
 		-c | --crop )		shift
 					crop_zone=$1
@@ -42,7 +49,7 @@ while [[ $# -gt 0 ]]; do
 		-h | --help )           usage
 					exit
 					;;
-		* )			working_dir=get_yesterday_dir
+		* )			day=get_last_day
 					;;
 	esac
 	shift
@@ -52,8 +59,9 @@ done
 source $(dirname $(readlink -f $0))/common.sh 
 pre_flight_checks
 
-function generate_daylight() {
+function generate_day_band() {
 	WORKDIR=$1
+	[[ ! -d $WORKDIR ]] && echo "WARN $WORKDIR does not exist: Skipping it" && return 0
 	tmpfile=$TMP_DIR/tmp_daylight_$$.txt
 
 	echo "# ImageMagick pixel enumeration: 1,1440,65535,srgb" > $tmpfile
@@ -195,6 +203,7 @@ function generate_month_band() {
 		sanitized_date=$(date -d "${1}-${day}" "+%Y-%m-%d") 2>/dev/null || continue
 		[[ $today == $sanitized_date ]] && break
 		daylight_filepath="$PIC_DIR/$sanitized_date/daylight.png"
+		[[ -f $daylight_filepath ]] || generate_day_band $PIC_DIR/$sanitized_date
 		if test -f $daylight_filepath ; then
 			filelist=$(echo -n "$filelist $daylight_filepath")
 		else
@@ -203,7 +212,7 @@ function generate_month_band() {
 	done
 
 	# actually create the png
-	convert +append $(echo $filelist) -colors 256 $result_file
+	convert +append $(echo $filelist) -colors 256 PNG8:$result_file
 }	
 
 function generate_year_band() {
@@ -224,6 +233,7 @@ function generate_year_band() {
 			sanitized_date=$(date -d "${1}-${month}-${day}" "+%Y-%m-%d" 2>/dev/null) || continue
 			[[ $today == $sanitized_date ]] && break
 			daylight_filepath="$PIC_DIR/$sanitized_date/daylight.png"
+			[[ -f $daylight_filepath ]] || generate_day_band $PIC_DIR/$sanitized_date
 			if test -f $daylight_filepath ; then
 				filelist=$(echo -n "$filelist $daylight_filepath")
 			else
@@ -237,12 +247,41 @@ function generate_year_band() {
 	convert +append $(echo $filelist) PNG8:$result_file
 }	
 
+function generate_months_from_to() {
+	from_year=$(echo $1 | cut -d '-' -f1)
+	to_year=$(echo $2 | cut -d '-' -f1)
+	from_month=$(echo $1 | cut -d '-' -f2)
+	to_month=$(echo $2 | cut -d '-' -f2)
 
+	month_list=""
+
+	for year in $(seq $from_year $to_year) ; do
+		for month in $(seq 1 12) ; do
+			[[ $month -lt 10 ]] && month=$(echo "0$month")
+			[[ -z $month_list ]] && [[ ! $month == $from_month ]] && continue
+			month_list=$(echo -n "$month_list $year-$month")
+			[[ "$year-$month" == $2 ]] && break
+		done
+	done
+
+	echo "INFO Will generate daylight monthly bands for:$month_list"
+
+	for m in $month_list ; do
+		echo "INFO Generating month: $m"
+		generate_month_band $m
+	done
+}
 #main
 set +u
 if [[ ! -z $year ]] ; then
 	set -u
 	generate_year_band $year
+	exit 0
+fi
+
+if [[ ! -z $month_from ]] && [[ ! -z $month_to ]] ; then
+	set -u	
+	generate_months_from_to $month_from $month_to
 	exit 0
 fi
 
@@ -257,13 +296,14 @@ if [[ ! -z $numdays ]] ; then
 	generate_lastndayview $numdays
 	exit 0
 fi
-
+day=$(get_last_day)
+working_dir=$PIC_DIR/$day
 if [[ $force == 1 ]] || ! test -f $working_dir/daylight.png ; then
 	set -u
-	generate_daylight $working_dir
+	generate_day_band $working_dir
 	[[ $? == 0 ]] || exit 1
 fi
 
 #default
-set +e
-generate_yearview
+#set +e
+#generate_yearview
