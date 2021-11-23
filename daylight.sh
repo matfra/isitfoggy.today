@@ -22,6 +22,8 @@ while [[ $# -gt 0 ]]; do
 					;;
 		-f | --force )		force=1
 					;;
+		-w | --html_only )	html_only=1
+					;;
 		-n | --numdays )	shift
 					numdays=$1
 					;;
@@ -271,11 +273,78 @@ function generate_months_from_to() {
 		generate_month_band $m
 	done
 }
+
+function generate_html() {
+	#Build the list of all daylight monthly files
+	#Stitch them together and slap links on them
+	daylight_monthly_bands=$(find $PIC_DIR/daylight -type f -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}\.png" -exec basename \{\} \;|sort -n) 
+
+	# Generate the html
+	HTML_DIR=$(dirname $(readlink -f $0))/html
+	HTML_FILE=$TMP_DIR/daylight2.html
+	echo '<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>isitfoggy daylight browser</title>
+    <link rel="stylesheet" href="daylight.css">
+  </head>
+    <body>
+      <div class="top">' >> $HTML_FILE
+	for month_band in $daylight_monthly_bands; do 
+		width=$(( 2 * $(identify -format "%w"  $PIC_DIR/daylight/$month_band)))
+		month_name=$(echo $month_band | cut -d "." -f1)
+		echo "<div style=\"min-width:${width}px;\" class=\"band\">
+<a class=\"month_link\" href=\"#month=$month_name\"><img class=\"month_band\" src=\"photos/daylight/$month_band\"></a></div>" >> $HTML_FILE
+	done
+	echo '
+      <div class="right">
+          <div class="timeboxeven">12 AM</div>
+          <div class="timeboxodd">1 AM</div>
+  <div class="timeboxeven">2 AM</div>
+  <div class="timeboxodd">3 AM</div>
+  <div class="timeboxeven">4 AM</div>
+  <div class="timeboxodd">5 AM</div>
+  <div class="timeboxeven">6 AM</div>
+  <div class="timeboxodd">7 AM</div>
+  <div class="timeboxeven">8 AM</div>
+  <div class="timeboxodd">9 AM</div>
+  <div class="timeboxeven">10 AM</div>
+  <div class="timeboxodd">11 AM</div>
+  <div class="timeboxeven">12 PM</div>
+  <div class="timeboxodd">1 PM</div>
+  <div class="timeboxeven">2 PM</div>
+  <div class="timeboxodd">3 PM</div>
+  <div class="timeboxeven">4 PM</div>
+  <div class="timeboxodd">5 PM</div>
+  <div class="timeboxeven">6 PM</div>
+  <div class="timeboxodd">7 PM</div>
+  <div class="timeboxeven">8 PM</div>
+  <div class="timeboxodd">9 PM</div>
+  <div class="timeboxeven">10 PM</div>
+  <div class="timeboxodd">11 PM</div>
+  </div>
+  </div>
+  <div class="bottom">Months and years here</div>
+  <script src="lib/jquery.min.js"></script>
+    </body>
+</html>' >> $HTML_FILE
+	mv $HTML_FILE $HTML_DIR/
+		
+	exit 0
+}
+
 #main
 set +u
 if [[ ! -z $year ]] ; then
 	set -u
 	generate_year_band $year
+	exit 0
+fi
+
+if [[ $html_only == 1 ]] ; then
+	set -u	
+	generate_html
 	exit 0
 fi
 
