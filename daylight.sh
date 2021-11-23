@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+# TODO: https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
+
 function get_last_day() {
 	basename $(find $PIC_DIR/ -type d -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}" |sort -n |tail -2 |head -1) 
 }
@@ -277,7 +279,7 @@ function generate_months_from_to() {
 function generate_html() {
 	#Build the list of all daylight monthly files
 	#Stitch them together and slap links on them
-	daylight_monthly_bands=$(find $PIC_DIR/daylight -type f -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}\.png" -exec basename \{\} \;|sort -n) 
+	daylight_monthly_bands=$(find $PIC_DIR/daylight -type f -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}\.png" -exec basename \{\} \;|sort -rn) 
 
 	# Generate the html
 	HTML_DIR=$(dirname $(readlink -f $0))/html
@@ -286,52 +288,108 @@ function generate_html() {
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8, user-scalable=no">
     <title>isitfoggy daylight browser</title>
     <link rel="stylesheet" href="daylight.css">
   </head>
-    <body>
-      <div class="top">' >> $HTML_FILE
-	for month_band in $daylight_monthly_bands; do 
-		width=$(( 2 * $(identify -format "%w"  $PIC_DIR/daylight/$month_band)))
-		month_name=$(echo $month_band | cut -d "." -f1)
-		echo "<div style=\"min-width:${width}px;\" class=\"band\">
-<a class=\"month_link\" href=\"#month=$month_name\"><img class=\"month_band\" src=\"photos/daylight/$month_band\"></a></div>" >> $HTML_FILE
-	done
+    <body>' > $HTML_FILE
 	echo '
       <div class="right">
-          <div class="timeboxeven">12 AM</div>
-          <div class="timeboxodd">1 AM</div>
-  <div class="timeboxeven">2 AM</div>
-  <div class="timeboxodd">3 AM</div>
-  <div class="timeboxeven">4 AM</div>
-  <div class="timeboxodd">5 AM</div>
-  <div class="timeboxeven">6 AM</div>
-  <div class="timeboxodd">7 AM</div>
-  <div class="timeboxeven">8 AM</div>
-  <div class="timeboxodd">9 AM</div>
-  <div class="timeboxeven">10 AM</div>
-  <div class="timeboxodd">11 AM</div>
-  <div class="timeboxeven">12 PM</div>
-  <div class="timeboxodd">1 PM</div>
-  <div class="timeboxeven">2 PM</div>
-  <div class="timeboxodd">3 PM</div>
-  <div class="timeboxeven">4 PM</div>
-  <div class="timeboxodd">5 PM</div>
-  <div class="timeboxeven">6 PM</div>
-  <div class="timeboxodd">7 PM</div>
-  <div class="timeboxeven">8 PM</div>
-  <div class="timeboxodd">9 PM</div>
-  <div class="timeboxeven">10 PM</div>
-  <div class="timeboxodd">11 PM</div>
-  </div>
-  </div>
-  <div class="bottom">Months and years here</div>
+        <div class="timeboxeven">12 AM</div>
+        <div class="timeboxodd">1 AM</div>
+        <div class="timeboxeven">2 AM</div>
+        <div class="timeboxodd">3 AM</div>
+        <div class="timeboxeven">4 AM</div>
+        <div class="timeboxodd">5 AM</div>
+        <div class="timeboxeven">6 AM</div>
+        <div class="timeboxodd">7 AM</div>
+        <div class="timeboxeven">8 AM</div>
+        <div class="timeboxodd">9 AM</div>
+        <div class="timeboxeven">10 AM</div>
+        <div class="timeboxodd">11 AM</div>
+        <div class="timeboxeven">12 PM</div>
+        <div class="timeboxodd">1 PM</div>
+        <div class="timeboxeven">2 PM</div>
+        <div class="timeboxodd">3 PM</div>
+        <div class="timeboxeven">4 PM</div>
+        <div class="timeboxodd">5 PM</div>
+        <div class="timeboxeven">6 PM</div>
+        <div class="timeboxodd">7 PM</div>
+        <div class="timeboxeven">8 PM</div>
+        <div class="timeboxodd">9 PM</div>
+        <div class="timeboxeven">10 PM</div>
+        <div class="timeboxodd">11 PM</div>
+      </div>' >> $HTML_FILE
+	echo '
+      <div class="bands">' >> $HTML_FILE
+	for month_band in $daylight_monthly_bands; do 
+		width=$(( 1 * $(identify -format "%w"  $PIC_DIR/daylight/$month_band)))
+		month_name=$(echo $month_band | cut -d "." -f1)
+		month_pretty_name=$(date -d "$month_name-01" "+%b<br>%Y")
+		echo "
+        <div class=\"band\" style=\"flex-grow:${width};\">
+          <div class=\"band_img_and_link\">
+            <a class=\"month_link\" href=\"daylight_$month_name.html\">
+              <img class=\"month_band\" width=\"${width}px\" height=\"1440px\" src=\"photos/daylight/$month_band\">
+            </a>
+          </div>
+          <div class=\"month\"><p>$month_pretty_name</p></div>
+        </div>
+" >> $HTML_FILE
+	done
+	echo '
+      </div>
+    </body>
+</html>' >> $HTML_FILE
+	mv $HTML_FILE $HTML_DIR/
+
+# Now generate the individual month html files		
+	for month_band in $daylight_monthly_bands; do 
+		width=$(( 1 * $(identify -format "%w"  $PIC_DIR/daylight/$month_band)))
+		month_name=$(echo $month_band | cut -d "." -f1)
+		generate_monthly_html $month_name $width
+	done
+	exit 0
+}
+
+function generate_monthly_html () {
+	month=$1
+	width=$2
+	month_pretty_name=$(date -d "$month-01" "+%b %Y")
+	month_band_web_path="daylight/$month.png"
+	HTML_DIR="$(dirname $(readlink -f $0))/html"
+	HTML_FILE="$TMP_DIR/daylight_$month.html"
+	echo '<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>isitfoggy daylight browser</title>
+    <link rel="stylesheet" href="daylight.css">
+  </head>
+    <body>' > $HTML_FILE
+	echo "<img src=\"photos/$month_band_web_path\" usemap=\"#daylight\" width=\"${width}\" height=\"1440\">">> $HTML_FILE
+	echo "<map name=\"daylight\">" >> $HTML_FILE
+	x=0
+	for day in $(seq 1 $width) ; do
+		[[ $day -lt 10 ]] && day=$(echo "0$day")
+		isodate="$month-$day"
+		dirlink="photos/$isodate/"
+		echo "
+                <area shape=\"rect\" coords=\"$x,0,$((x+1)),1439\" alt=\"$isodate\" href=\"$dirlink\">" >> $HTML_FILE
+		x="$((x+1))"
+	done
+	echo '</map>     
+      </div>
   <script src="lib/jquery.min.js"></script>
+  <script src="lib/jquery.rwdImageMaps.min.js"></script>
+
+    <script>
+    $(document).ready(function(e) { $("img[usemap]").rwdImageMaps();});
+    </script>
     </body>
 </html>' >> $HTML_FILE
 	mv $HTML_FILE $HTML_DIR/
 		
-	exit 0
 }
 
 #main
