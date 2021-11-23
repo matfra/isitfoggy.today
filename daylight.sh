@@ -53,7 +53,8 @@ while [[ $# -gt 0 ]]; do
 		-h | --help )           usage
 					exit
 					;;
-		* )			day=get_last_day
+		* )			usage
+					exit
 					;;
 	esac
 	shift
@@ -343,18 +344,18 @@ function generate_html() {
 </html>' >> $HTML_FILE
 	mv $HTML_FILE $HTML_DIR/
 
-# Now generate the individual month html files		
-	for month_band in $daylight_monthly_bands; do 
-		width=$(( 1 * $(identify -format "%w"  $PIC_DIR/daylight/$month_band)))
-		month_name=$(echo $month_band | cut -d "." -f1)
-		generate_monthly_html $month_name $width
-	done
+## Now generate the individual month html files		
+#	for month_band in $daylight_monthly_bands; do 
+#		width=$(( 1 * $(identify -format "%w"  $PIC_DIR/daylight/$month_band)))
+#		month_name=$(echo $month_band | cut -d "." -f1)
+#		generate_monthly_html $month_name
+#	done
 	exit 0
 }
 
 function generate_monthly_html () {
 	month=$1
-	width=$2
+	width=$(( 1 * $(identify -format "%w"  $PIC_DIR/daylight/$month.png)))
 	month_pretty_name=$(date -d "$month-01" "+%b %Y")
 	month_band_web_path="daylight/$month.png"
 	HTML_DIR="$(dirname $(readlink -f $0))/html"
@@ -423,12 +424,22 @@ if [[ ! -z $numdays ]] ; then
 	generate_lastndayview $numdays
 	exit 0
 fi
-day=$(get_last_day)
-working_dir=$PIC_DIR/$day
-if [[ $force == 1 ]] || ! test -f $working_dir/daylight.png ; then
-	set -u
-	generate_day_band $working_dir
-	[[ $? == 0 ]] || exit 1
+if [[ ! -z $day ]] ; then
+	working_dir="$PIC_DIR/$day"
+	if [[ $force == 1 ]] || ! test -f $working_dir/daylight.png ; then
+		set -u
+		generate_day_band $working_dir
+		if [[ $? == 0 ]] ; then
+			month=$(echo $day |cut -d '-' -f1-2)
+			generate_month_band $month
+			generate_monthly_html $month
+			generate_html
+		else
+			exit 1
+		fi
+	else
+		echo "WARN $working_dir/daylight.png already exists. use -f to overwrite"
+	fi
 fi
 
 #default
