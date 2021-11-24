@@ -68,6 +68,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Load the common isitfoggy tooling library
+echo "INFO Preflight checks"
 source $(dirname $(readlink -f $0))/common.sh 
 pre_flight_checks
 HTML_DIR=$(dirname $(readlink -f $0))/html
@@ -95,6 +96,7 @@ function fatal () {
 
 function generate_day_band() {
 	# Historical: Takes workdir as an argument, typically $PIC_DIR/1986-09-30
+	echo "INFO Generating daylight band for data in directory $1"
 	WORKDIR=$1
 	[[ ! -d $WORKDIR ]] && echo "WARN $WORKDIR does not exist: Skipping it" && return 0
 	tmpfile=$TMP_DIR/tmp_daylight_$$.txt
@@ -127,6 +129,7 @@ function generate_black_band() {
 function generate_month_band() {
 	# args: year-month
 	
+	echo "INFO $1 Generating month band"
 	#Checks
 	DAYLIGHT_DIR="$PIC_DIR/daylight"
 	[[ -d $DAYLIGHT_DIR ]] || mkdir $DAYLIGHT_DIR
@@ -173,8 +176,7 @@ function generate_months_from_to() {
 	done
 
 	for m in $month_list ; do
-		echo "INFO Generating month: $m"
-		[[ html_only == 1 ]] || generate_month_band $m
+		[[ $html_only == 1 ]] || generate_month_band $m
 		generate_month_html $m
 	done
 }
@@ -185,6 +187,7 @@ function generate_months_from_to() {
 
 function dump_html_header() {
 	# Takes title of the page as an argument
+	title="$1"
 	echo "<!DOCTYPE html>
 <html>
   <head>
@@ -209,7 +212,7 @@ function generate_html_browser() {
 	#Build the list of all daylight monthly files
 	#Stitch them together and slap links on them
 	daylight_monthly_bands=$(find $PIC_DIR/daylight -type f -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}\.png" -exec basename \{\} \;|sort -rn) 
-
+	echo "INFO Generating browser HTML file"
 	# Generate the html
 	HTML_FILE=$TMP_DIR/daylight2.html
 	dump_html_header "Daylight browser: isitfoggy" > $HTML_FILE
@@ -265,6 +268,7 @@ function generate_html_browser() {
 }
 
 function generate_month_html () {
+	echo "INFO $1 Generating month HTML page"
 	month=$1
 	width=$(( 1 * $(identify -format "%w"  $PIC_DIR/daylight/$month.png)))
 	month_pretty_name=$(date -d "$month-01" "+%b %Y")
@@ -279,8 +283,7 @@ function generate_month_html () {
 		[[ $day -lt 10 ]] && day=$(echo "0$day")
 		isodate="$month-$day"
 		dirlink="photos/$isodate/"
-		echo "
-                <area shape=\"rect\" coords=\"$x,0,$((x+1)),1439\" alt=\"$isodate\" href=\"$dirlink\">" >> $HTML_FILE
+		echo "      <area shape=\"rect\" coords=\"$x,0,$((x+1)),1439\" alt=\"$isodate\" href=\"$dirlink\">" >> $HTML_FILE
 		x="$((x+1))"
 	done
 	echo '    </map>     
@@ -320,7 +323,7 @@ fi
 if [[ ! -z $month ]] ; then
 	set -u
 	validate_iso_month "$month" || fatal "Bad iso month to: $month"
-	[[ html_only == 1 ]] || generate_month_band $month
+	[[ $html_only == 1 ]] || generate_month_band $month
 	generate_month_html $month
 	generate_html_browser
 	exit 0
