@@ -25,6 +25,10 @@ function is_dir_bigger_than() {
 }
 
 function log() {
+	echo "$0 $1"
+}
+
+function log_to_file() {
     echo "$(date): $1" >> $LOG_FILE
 }
 
@@ -66,13 +70,19 @@ function archive_dir() {
     touch $1/archived
 }
 
+function check_user() {
+	[[ ! $(whoami) == "isitfoggy" ]] && echo "Please run this as user isitfoggy or permissions on files will be messed up. You can use: sudo -u isitfoggy $0" && exit 1
+}
+
 
 function pre_flight_checks() {
+	check_user
 	check_binaries
 	check_config
 	source $CONFIG_FILE
 	test_dir_write $PIC_DIR
 	test_dir_write $TMP_DIR
 	test_dir_write $LOG_DIR
-    make_room_on_disk
+   	make_room_on_disk
 }
+

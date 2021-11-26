@@ -20,6 +20,8 @@ ln -sf $SCRIPTPATH/snap.sh /usr/share/isitfoggy/snap.sh
 ln -sf $SCRIPTPATH/timelapse.sh /usr/share/isitfoggy/timelapse.sh
 ln -sf $SCRIPTPATH/utils/ssim /usr/local/bin/ssim
 ln -sf $CONFIG_FILE /etc/isitfoggy.conf
+# Used by calibration.sh/calibration.html
+ln -sf $TMP_DIR/test $PIC_DIR/test
 
 #Installing as a service
 systemctl daemon-reload

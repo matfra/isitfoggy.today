@@ -1,8 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-# TODO: https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
-
 # Defaults args
 crop_zone="320x200+80+150"
 gravity="North"
@@ -68,8 +66,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Load the common isitfoggy tooling library
-echo "INFO Preflight checks"
 source $(dirname $(readlink -f $0))/common.sh 
+log "INFO Preflight checks"
 pre_flight_checks
 HTML_DIR=$(dirname $(readlink -f $0))/html
 
