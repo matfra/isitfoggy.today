@@ -86,7 +86,10 @@ And get an API key (in your profile section). Fill all this information in /etc/
 cd utils/update_dns.sh
 ```
 
-
+## CREDITS:
+- Thanks to https://github.com/stowball/jQuery-rwdImageMaps for the per month daylight browser
+- Thanks to https://github.com/mozilla/mozjpeg for fast and efficient JPEG recompression
+- Thanks to http://www.fmwconcepts.com/imagemagick/ssim/index.php for difference detection between 2 pictures
 
 ## TO-DO:
 ### Frontend
@@ -95,3 +98,6 @@ cd utils/update_dns.sh
 - Package everything into a .deb
 - Allow people to write their own camera wrapper
 - Implement zone defined whitebalance
+### Installation
+- Remove/template all the things to prevent any hardocded values specific to my setup
+- Add steps to compile the mozjpeg libraries
