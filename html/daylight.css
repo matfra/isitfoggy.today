@@ -1,6 +1,6 @@
 
 body {
-	margin: 0px;
+	margin: 0;
 	background: #000;
     display: flex;
 	direction: rtl;
@@ -9,11 +9,10 @@ body {
 	position: relative;
 	height: 4.16667%;
 	text-align: center;
-	margin:0px;
-	padding: 0px;
-	border:0px;
+	margin: 0;
+	padding: 0;
+	border: 0;
 	border-bottom-style: none;
-	padding: 0px;
 	margin-left: 5px;
 	margin-right: 5px;
 	font-family: monospace;
@@ -24,12 +23,13 @@ body {
 	border-bottom: black;
 	color:#cccccc;
 	text-align: center;
-	margin:0px;
-	padding: 0px;
-	border:0px;
+	margin: 0;
+	border: 0;
 	border-bottom-style: none;
 	font-size: 16pt;
 	background-color: #444444;
+	padding-top: 0;
+	padding-bottom: 0;
 	padding-left: 5px;
 	padding-right: 5px;
 	font-family: monospace;
@@ -40,12 +40,12 @@ body {
 	color:#dddddd;
 	border-bottom: black;
 	text-align: center;
-	margin:0px;
-	padding-top: 0px;
-	padding-bottom: 0px;
+	margin: 0;
+	padding-top: 0;
+	padding-bottom: 0;
 	padding-left: 5px;
 	padding-right: 5px;
-	border:0px;
+	border: 0;
 	border-bottom-style: none;
 	font-size: 18pt;
 	font-family: monospace;
@@ -56,7 +56,7 @@ body {
 	text-align: right;
 	color:lightgray;
 	padding-right: 5px;
-	margin:0px;
+	margin: 0;
 	top:4.545%;
 	position: relative;
 
@@ -85,14 +85,14 @@ body {
 }
 
 .Zmonth_link {
-margin: 0px;
-padding: 0px;
-border: 0px;
+margin: 0;
+padding: 0;
+border: 0;
 }
 .Zmonth_band {
-margin: 0px;
-padding: 0px;
-border: 0px;
+margin: 0;
+padding: 0;
+border: 0;
 vertical-align: top;
 height: 100%;
 width: 100%;
@@ -102,15 +102,15 @@ image-rendering: pixelated;
 flex: 1;
 flex-direction: row-reverse;
 height: 100%;
-margin: 0px;
-padding: 0px;
-border: 0px;
+margin: 0;
+padding: 0;
+border: 0;
 min-width: 60px;
 position: relative;
 }
 .right {    
     right: 0%;
-    top: 0px;
+    top: 0;
     width: 100px;
     height: 90vh;
 	position: sticky;
