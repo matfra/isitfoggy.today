@@ -24,7 +24,29 @@ function is_dir_bigger_than() {
     [[ $dir_size -gt $limit ]] && return 0 || return 1
 }
 
+# This file descriptor 3 redirects to the stdout of the main process.
+# So we can log to the main stdout from inside functions
+exec 3>&1
 function log() {
+	[[ $# -lt 1 ]] && return
+	case $1 in
+		DEBUG | INFO )			LEVEL=$1
+						output_fd=3
+						shift
+						;;
+		WARN | ERROR )			LEVEL=$1
+						output_fd=2
+						shift
+						;;
+		* )				LEVEL="INFO"
+						output_fd=3
+						;;
+	esac
+	[[ $LEVEL == "DEBUG" ]] && [[ ! ${DEBUG:-0} == 1 ]] && return || true
+	printf "%s | %s | %s\n" "$LEVEL" "${FUNCNAME[*]:1}" "$*" >&$output_fd
+}
+
+function log_to_file() {
     echo "$(date): $1" >> $LOG_FILE
 }
 
@@ -66,13 +88,37 @@ function archive_dir() {
     touch $1/archived
 }
 
+function check_user() {
+	if [ "$(whoami)" == "isitfoggy" ] ; then
+		return 0
+	else
+		echo "Please run this as user isitfoggy or permissions on files will be messed up. You can use: sudo -u isitfoggy $0"
+		exit 1
+	fi
+}
+
 
 function pre_flight_checks() {
+	check_user
 	check_binaries
 	check_config
 	source $CONFIG_FILE
 	test_dir_write $PIC_DIR
 	test_dir_write $TMP_DIR
 	test_dir_write $LOG_DIR
-    make_room_on_disk
+   	make_room_on_disk
+}
+
+function validate_iso_month() {
+	echo "$1" |grep -q -E '^[0-9]{4}\-[0-1][0-9]$'
+	return $?
+}
+
+function sanitize_iso_date() {
+	date -d "$1" "+%Y-%m-%d"
+}
+
+function fatal () {
+	log ERROR "$@"
+	exit 1
 }

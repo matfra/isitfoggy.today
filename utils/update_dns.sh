@@ -50,7 +50,7 @@ function update_record() {
 
 echo -n "Checking local IP Address: "
 my_ip=$(curl -s ifconfig.me)
-my_ipv6=$(ip addr show scope global |perl -n -e'/inet6\s(.*)\//&& print $1')
+my_ipv6=$(ip addr show scope global |grep inet6 |head -1|perl -n -e'/inet6\s([0-9a-f:]+)\/\d+\s/&& print $1')
 echo $my_ip
 [[ -z $my_ipv6 ]] && echo "Found an global ipv6! : $my_ip" 
 

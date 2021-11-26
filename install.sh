@@ -1,11 +1,13 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 CONFIG_FILE=$SCRIPTPATH/conf/isitfoggy.conf
 
 source $CONFIG_FILE
 
-#useradd -d /opt/isitfoggy -m -G video -s /bin/nologin isitfoggy
+useradd -d /opt/isitfoggy -m -G video -s /bin/nologin isitfoggy
+# Allow user to reboot if camera is stuck
+echo "isitfoggy ALL=NOPASSWD:/sbin/reboot" > /etc/sudoers.d/011_isitfoggy-reboot
 DIRLIST="/var/log/isitfoggy /usr/share/isitfoggy /var/lib/isitfoggy /var/tmp/isitfoggy /var/lib/isitfoggy/photos"
 
 for d in $DIRLIST ; do
@@ -20,6 +22,8 @@ ln -sf $SCRIPTPATH/snap.sh /usr/share/isitfoggy/snap.sh
 ln -sf $SCRIPTPATH/timelapse.sh /usr/share/isitfoggy/timelapse.sh
 ln -sf $SCRIPTPATH/utils/ssim /usr/local/bin/ssim
 ln -sf $CONFIG_FILE /etc/isitfoggy.conf
+# Used by calibration.sh/calibration.html
+ln -sf $TMP_DIR/test $PIC_DIR/test
 
 #Installing as a service
 systemctl daemon-reload
