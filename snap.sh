@@ -12,6 +12,7 @@ function get_light() {
 	sudo reboot
     fi
 light_values=$(convert $MEASURE_FILE -resize 1x1 -set colorspace Gray -separate -average txt: |tail -1 |cut -d "(" -f2 |cut -d ")" -f1)
+    log $light_values
     echo $light_values | cut -d ',' -f3
 }
 
@@ -22,22 +23,22 @@ function get_snap_interval_from_diff() {
 
 function get_shutter_speed() {
 # https://docs.google.com/spreadsheets/d/1-merFoSUlKPvFpYkskaAGFvJg0_1BtaKPWaCKVzcVBM/edit?usp=sharing
-    blue_light=$1
+    light=$1
 
-    [[ $blue_light -gt 64000 ]] && echo "-drc low" && return 0
-    [[ $blue_light -ge 30000 ]] && echo $blue_light | perl -lne 'printf "-drc high -ss " ;print int(926008-81406*log($_))' && return 0
-    [[ $blue_light -ge 5500 ]] && echo $blue_light | perl -lne 'printf "-drc high -ss " ;print int(5.00*1000000-460383*log($_))' && return 0
-    [[ $blue_light -ge 100 ]] && echo $blue_light | perl -lne 'printf "-drc high -ss " ;print int(3.48*1000000*exp(-3.15*0.0001*$_))' && return 0
+    [[ $light -gt 64000 ]] && echo "-drc low" && return 0
+    [[ $light -ge 30000 ]] && echo $light | perl -lne 'printf "-drc high -ss " ;print int(926008-81406*log($_))' && return 0
+    [[ $light -ge 5500 ]] && echo $light | perl -lne 'printf "-drc high -ss " ;print int(5.00*1000000-460383*log($_))' && return 0
+    [[ $light -ge 100 ]] && echo $light | perl -lne 'printf "-drc high -ss " ;print int(3.48*1000000*exp(-3.15*0.0001*$_))' && return 0
     echo "-drc off -ss 4000000" && return 0
 
 }
 
 function get_snap_interval() {
-    blue_light=$1
+    light=$1
     # We want to take more picture during the day than during the night.
     # We want to take even more pictures during sunset and sunrise to make beautiful timelapses.
-    [[ $blue_light -lt 12 ]] && echo 70 && return 0  #night
-    [[ $blue_light -lt 65000 ]] && echo 1 && return 0  #sunrise/sunset
+    [[ $light -lt 12 ]] && echo 70 && return 0  #night
+    [[ $light -lt 65000 ]] && echo 1 && return 0  #sunrise/sunset
     echo 45 && return 0 #full day
 }
 
@@ -92,10 +93,9 @@ while true; do
 	[[ -d $PIC_DIR/$cur_date ]] || mkdir -p $PIC_DIR/$cur_date
 	# Let's skip light measure if we are in full daylight and snap interval is short. Usually synonym of nice clouds. Let's break that rule after 60 iteration maximum ( ~ 5 minutes max) just to be sure to catch a light change.
 	if [[ $percent_light == 65535 ]] && [[ $snap_interval -lt 10 ]] && [[ ! $((count % 48 )) == 0 ]]; then
-		log "light: $percent_light (Skipping measure to increase snap frequency)"
+		log "Skipping light measure to increase snap frequency)"
 	else
 		percent_light=$(get_light)
-		log "light: ${percent_light}"
 	fi
 	capture "$TMP_PIC_PATH" $percent_light
 	optimize_pic "$TMP_PIC_PATH"
