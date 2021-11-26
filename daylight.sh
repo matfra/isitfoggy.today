@@ -169,6 +169,7 @@ function generate_months_from_to() {
 function dump_html_header() {
 	# Takes title of the page as an argument
 	title="$1"
+	additional_headers="$(cat $HTML_DIR/common_head_tags.html 2>/dev/null)"
 	echo "<!DOCTYPE html>
 <html>
   <head>
@@ -176,15 +177,7 @@ function dump_html_header() {
     <meta name=\"viewport\" content=\"width=device-width, initial-scale=0.8, user-scalable=no\">
     <title>$title</title>
     <link rel=\"stylesheet\" href=\"daylight.css\">
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src=\"https://www.googletagmanager.com/gtag/js?id=G-TVGKVGZXNQ\"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-    
-      gtag('config', 'G-TVGKVGZXNQ');
-    </script>
+    $additional_headers
   </head>"
 }
 
