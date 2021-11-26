@@ -109,3 +109,16 @@ function pre_flight_checks() {
    	make_room_on_disk
 }
 
+function validate_iso_month() {
+	echo "$1" |grep -q -E '^[0-9]{4}\-[0-1][0-9]$'
+	return $?
+}
+
+function sanitize_iso_date() {
+	date -d "$1" "+%Y-%m-%d"
+}
+
+function fatal () {
+	log ERROR "$@"
+	exit 1
+}

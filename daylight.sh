@@ -72,31 +72,14 @@ pre_flight_checks
 HTML_DIR=$(dirname $(readlink -f $0))/html
 
 
-##################
-# Helper functions
-
-function validate_iso_month() {
-	echo "$1" |grep -q -E '^[0-9]{4}\-[0-1][0-9]$'
-	return $?
-}
-
-function sanitize_iso_date() {
-	date -d "$1" "+%Y-%m-%d"
-}
-
-function fatal () {
-	$message="FATAL $1"
-	exit 1
-}
-
 ################
 # Generate bands
 
 function generate_day_band() {
 	# Historical: Takes workdir as an argument, typically $PIC_DIR/1986-09-30
-	echo "INFO Generating daylight band for data in directory $1"
+	log INFO "Generating daylight band for data in directory $1"
 	WORKDIR=$1
-	[[ ! -d $WORKDIR ]] && echo "WARN $WORKDIR does not exist: Skipping it" && return 0
+	[[ ! -d $WORKDIR ]] && log WARN "$WORKDIR does not exist: Skipping it" && return 0
 	tmpfile=$TMP_DIR/tmp_daylight_$$.txt
 
 	echo "# ImageMagick pixel enumeration: 1,1440,65535,srgb" > $tmpfile
@@ -127,7 +110,7 @@ function generate_black_band() {
 function generate_month_band() {
 	# args: year-month
 	
-	echo "INFO $1 Generating month band"
+	log INFO "$1 Generating month band"
 	#Checks
 	DAYLIGHT_DIR="$PIC_DIR/daylight"
 	[[ -d $DAYLIGHT_DIR ]] || mkdir $DAYLIGHT_DIR
@@ -210,7 +193,7 @@ function generate_html_browser() {
 	#Build the list of all daylight monthly files
 	#Stitch them together and slap links on them
 	daylight_monthly_bands=$(find $PIC_DIR/daylight -type f -regextype sed -regex ".*/[0-9]\{4\}-[0-9]\{2\}\.png" -exec basename \{\} \;|sort -rn) 
-	echo "INFO Generating browser HTML file"
+	log INFO "Generating browser HTML file"
 	# Generate the html
 	HTML_FILE=$TMP_DIR/daylight2.html
 	dump_html_header "Daylight browser: isitfoggy" > $HTML_FILE
@@ -266,7 +249,7 @@ function generate_html_browser() {
 }
 
 function generate_month_html () {
-	echo "INFO $1 Generating month HTML page"
+	log INFO "$1 Generating month HTML page"
 	month=$1
 	width=$(( 1 * $(identify -format "%w"  $PIC_DIR/daylight/$month.png)))
 	month_pretty_name=$(date -d "$month-01" "+%b %Y")
@@ -342,6 +325,6 @@ if [[ ! -z $day ]] ; then
 			exit 1
 		fi
 	else
-		echo "WARN $working_dir/daylight.png already exists. use -f to overwrite"
+		log WARN "$working_dir/daylight.png already exists. use -f to overwrite"
 	fi
 fi
