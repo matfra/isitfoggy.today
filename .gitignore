@@ -2,4 +2,4 @@ conf/isitfoggy.conf
 *.swp
 *.swo
 html/test/
-html/daylight_*
+html/daylight*.html
