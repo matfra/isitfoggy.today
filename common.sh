@@ -24,8 +24,26 @@ function is_dir_bigger_than() {
     [[ $dir_size -gt $limit ]] && return 0 || return 1
 }
 
+# This file descriptor 3 redirects to the stdout of the main process.
+# So we can log to the main stdout from inside functions
+exec 3>&1
 function log() {
-	echo "$0 $1"
+	[[ $# -lt 1 ]] && return
+	case $1 in
+		DEBUG | INFO )			LEVEL=$1
+						output_fd=3
+						shift
+						;;
+		WARN | ERROR )			LEVEL=$1
+						output_fd=2
+						shift
+						;;
+		* )				LEVEL="INFO"
+						output_fd=3
+						;;
+	esac
+	[[ $LEVEL == "DEBUG" ]] && [[ ! ${DEBUG:-0} == 1 ]] && return || true
+	printf "%s | %s | %s\n" "$LEVEL" "${FUNCNAME[*]:1}" "$*" >&$output_fd
 }
 
 function log_to_file() {
@@ -71,7 +89,12 @@ function archive_dir() {
 }
 
 function check_user() {
-	[[ ! $(whoami) == "isitfoggy" ]] && echo "Please run this as user isitfoggy or permissions on files will be messed up. You can use: sudo -u isitfoggy $0" && exit 1
+	if [ "$(whoami)" == "isitfoggy" ] ; then
+		return 0
+	else
+		echo "Please run this as user isitfoggy or permissions on files will be messed up. You can use: sudo -u isitfoggy $0"
+		exit 1
+	fi
 }
 
 

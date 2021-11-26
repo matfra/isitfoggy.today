@@ -1,11 +1,13 @@
-#!/bin/bash -x
+#!/bin/bash -ex
 SCRIPT=$(readlink -f "$0")
 SCRIPTPATH=$(dirname "$SCRIPT")
 CONFIG_FILE=$SCRIPTPATH/conf/isitfoggy.conf
 
 source $CONFIG_FILE
 
-#useradd -d /opt/isitfoggy -m -G video -s /bin/nologin isitfoggy
+useradd -d /opt/isitfoggy -m -G video -s /bin/nologin isitfoggy
+# Allow user to reboot if camera is stuck
+echo "isitfoggy ALL=NOPASSWD:/sbin/reboot" > /etc/sudoers.d/011_isitfoggy-reboot
 DIRLIST="/var/log/isitfoggy /usr/share/isitfoggy /var/lib/isitfoggy /var/tmp/isitfoggy /var/lib/isitfoggy/photos"
 
 for d in $DIRLIST ; do

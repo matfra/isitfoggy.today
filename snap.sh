@@ -1,19 +1,17 @@
 #!/bin/bash
 set -euo pipefail
-[[ $# -gt 0 ]] && [[ $1 == "-d" ]] && set -x
-
+DEBUG=0
+[[ $# -gt 0 ]] && [[ $1 == "-v" ]] && DEBUG=1 && set -x
 
 source $(dirname $(readlink -f $0))/common.sh
 
 function get_light() {
     timeout 60 raspistill $(eval echo ${LIGHT_MEASURE_OPTIONS--ISO 100 -drc off -awb sun -ss 1000 -w 160 -h 90 -o $MEASURE_FILE})
     if [[ $? == 124 ]] ; then
-	echo "Timeout using raspistill. rebooting"
-	sudo shutdown -r 2
+	log ERROR "Timeout using raspistill. rebooting"
+	sudo reboot
     fi
 light_values=$(convert $MEASURE_FILE -resize 1x1 -set colorspace Gray -separate -average txt: |tail -1 |cut -d "(" -f2 |cut -d ")" -f1)
-    log $light_values
-    echo $light_values |grep -q 65535 && echo 65535 && return 0 
     echo $light_values | cut -d ',' -f3
 }
 
@@ -47,12 +45,12 @@ function capture() {
     outfile=$1
     light=$2
     ss_flag=$(get_shutter_speed $2)
-    echo -n "Flags: $ss_flag, "
+    log DEBUG "Flags: $ss_flag, "
     awb_flags="" #-awb auto -fli off"
     timeout 60 raspistill $(eval echo ${CAPTURE_OPTIONS--sh 100 -ISO 100 $ss_flag $awb_flags -sa 7 -w 1920 -h 1080 -n -a 12 -th none -q 16 -o $outfile})
     if [[ $? == 124 ]] ; then
-	echo "Timeout using raspistill. rebooting"
-	sudo shutdown -r 2
+	log ERROR "Timeout using raspistill. rebooting"
+	sudo reboot
     fi
 }
 
@@ -80,10 +78,11 @@ umask 002
 count=0
 snap_interval=5
 percent_light=0
+pre_flight_checks
 while true; do
 	begin_time=$(date "+%s")
-	# Only do pre-flight checks every 10 pictures
-	[[ $((count % 10)) == 0 ]] && echo -n "Doing preflight checks. " && pre_flight_checks || echo -n "Skip preflight checks.  "
+	# Only do check disk space every 10 pictures
+	[[ $((count % 10)) == 0 ]] && make_room_on_disk
 	TMP_PIC_PATH="$TMP_DIR/snap.jpg"
 	TMP_OPTPIC_PATH="$TMP_DIR/optimized.jpg"
 	MEASURE_FILE="$TMP_DIR/measure.jpg"
@@ -93,10 +92,10 @@ while true; do
 	[[ -d $PIC_DIR/$cur_date ]] || mkdir -p $PIC_DIR/$cur_date
 	# Let's skip light measure if we are in full daylight and snap interval is short. Usually synonym of nice clouds. Let's break that rule after 60 iteration maximum ( ~ 5 minutes max) just to be sure to catch a light change.
 	if [[ $percent_light == 65535 ]] && [[ $snap_interval -lt 10 ]] && [[ ! $((count % 48 )) == 0 ]]; then
-		echo -n "light: skip (${percent_light}), "
+		log "light: $percent_light (Skipping measure to increase snap frequency)"
 	else
 		percent_light=$(get_light)
-		echo -n "light: ${percent_light}, "
+		log "light: ${percent_light}"
 	fi
 	capture "$TMP_PIC_PATH" $percent_light
 	optimize_pic "$TMP_PIC_PATH"
@@ -108,6 +107,6 @@ while true; do
 	snap_interval=$(get_snap_interval_from_diff $PIC_DIR/previous_th.jpg $PIC_DIR/latest_th.jpg)
 	count=$((count + 1))
 	end_time=$(date "+%s")
-	echo "Loop time was $((end_time - begin_time))s. Sleeping ${snap_interval}s"
+	log "Loop time was $((end_time - begin_time))s. Sleeping ${snap_interval}s"
 	sleep $snap_interval
 done
