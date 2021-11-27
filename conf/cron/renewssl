@@ -1,6 +1,0 @@
-# /etc/cron.d/isitfoggy: Multiple crontab entries to maintain the site up and running
-
-SHELL=/bin/sh
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-# One stops nginx and eventually renew certificates every months
-01 2	10 * * 	root 	systemctl stop nginx ; certbot renew ; systemctl start nginx
