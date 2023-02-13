@@ -80,6 +80,7 @@ function archive_dir() {
     [[ -z $2 ]] && archiving_ratio=30 || archiving_ratio=$2 # By default, keep 1 file every 30
     [[ -d $1 ]] || return 1
     [[ -f $1/archived ]] && return 2
+    [[ -f $1/timelapse.mp4 ]] || return 2
     for f in $(find $1 -type f -name '*.jpg' |sort -n); do
 	counter=$(( $counter + 1 ))
         [[ $(( $counter % $archiving_ratio )) == 0 ]] && continue

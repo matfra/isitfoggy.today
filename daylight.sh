@@ -19,6 +19,7 @@ Optional flags:
 Required flags:
 -h | --help 		This help
 -b | --browser_only 	Generate the HTML browser only
+-d | --day 		Normal daily mode. Generate a band for the given day and regen the monthly band and html
 -m | --month 		Generate the band for a given month. Example: -m 2020-11
 -r | --range		Generate the bands for all the months in the range. Example : -r 2020-01,2021-08
 "
@@ -82,9 +83,10 @@ function generate_day_band() {
 	[[ ! -d $WORKDIR ]] && log WARN "$WORKDIR does not exist: Skipping it" && return 0
 	tmpfile=$TMP_DIR/tmp_daylight_$$.txt
 
-	echo "# ImageMagick pixel enumeration: 1,1440,65535,srgb" > $tmpfile
+	echo "# ImageMagick pixel enumeration: 1,1440,255,srgb" > $tmpfile
 	#Initialize the var with an almost black pixel no matter what
-	value="(214,282,292)  #010101  srgb(1,1,1)"
+	default_value="(1,1,1)  #010101  srgb(1,1,1)"
+	value=$default_value
 	total_minute_count=0 #Used as y coordinate
 
 	for h in $(seq -w 0 23) ; do
@@ -92,7 +94,11 @@ function generate_day_band() {
 			pic=$(find $WORKDIR -type f -name ${h}${m}*.jpg |head -1)
 			# If no pic found, we will just write the previous value
 			if [[ ! -z $pic ]]  ; then
-				value=$(convert $pic -gravity North -crop $crop_zone -resize 1x1 txt:|grep "0,0:" |cut -d " " -f2-)
+				tmppng=$TMP_DIR/tmp_daylight_$$.png
+				convert $pic -gravity North -crop 100%x1+0+150 -resize 1x1 $tmppng
+				res=$(convert $tmppng txt:|| echo "0,0: $default_value")
+				value=$(echo "$res"|grep "0,0:" |cut -d " " -f2-)
+				rm $tmppng
 			fi
 			echo "0,${total_minute_count}: ${value}" >> $tmpfile
 			total_minute_count=$((total_minute_count+1))
@@ -126,7 +132,7 @@ function generate_month_band() {
 		[[ $today == $sanitized_date ]] && break
 		daylight_filepath="$PIC_DIR/$sanitized_date/daylight.png"
 		# If there is no daylight data, try to generate it
-		[[ -f $daylight_filepath ]] || generate_day_band $PIC_DIR/$sanitized_date
+		[[ -f $daylight_filepath ]] && [[ $force == 0 ]] || generate_day_band $PIC_DIR/$sanitized_date
 		if test -f $daylight_filepath ; then
 			filelist=$(echo -n "$filelist $daylight_filepath")
 		else
@@ -156,9 +162,9 @@ function generate_months_from_to() {
 		done
 	done
 
-	for m in $month_list ; do
-		[[ $html_only == 1 ]] || generate_month_band $m
-		generate_month_html $m
+	for mo in $month_list ; do
+		[[ $html_only == 1 ]] || generate_month_band $mo
+		generate_month_html $mo
 	done
 }
 
@@ -303,6 +309,7 @@ if [[ ! -z $month ]] ; then
 	exit 0
 fi
 
+# If a day is specified, generate the daylight for the day, then the month band.
 if [[ ! -z $day ]] ; then
 	sanitized_day=$(sanitize_iso_date "$day")
 	working_dir="$PIC_DIR/$sanitized_day"

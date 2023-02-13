@@ -6,14 +6,14 @@ DEBUG=0
 source $(dirname $(readlink -f $0))/common.sh
 
 function get_light() {
-    timeout 60 raspistill $(eval echo ${LIGHT_MEASURE_OPTIONS--ISO 100 -drc off -awb sun -ss 1000 -w 160 -h 90 -o $MEASURE_FILE})
+    timeout 60 raspistill $(eval echo ${LIGHT_MEASURE_OPTIONS--roi 0,0,1,1 --rotation 0} -ISO 100 -drc off -awb sun -ss 100000 -w 160 -h 90 -o $MEASURE_FILE)
     if [[ $? == 124 ]] ; then
 	log ERROR "Timeout using raspistill. rebooting"
 	sudo reboot
     fi
-light_values=$(convert $MEASURE_FILE -resize 1x1 -set colorspace Gray -separate -average txt: |tail -1 |cut -d "(" -f2 |cut -d ")" -f1)
+light_values=$(convert $MEASURE_FILE -resize 1x1 -set colorspace Gray -average -depth 16 txt: |tail -1 |cut -d "(" -f2 |cut -d ")" -f1)
     log $light_values
-    echo $light_values | cut -d ',' -f3
+    echo $light_values | cut -d ',' -f2 | cut -d '.' -f1
 }
 
 function get_snap_interval_from_diff() {
@@ -62,16 +62,17 @@ function create_thumbnail() {
 #Require mozjpeg cjpeg and jpeg binaries as well as exif
 function optimize_pic() {
 	#Takes jpg as first arg
-	read_exif=$(exif -i $1)
-	intermediate_speed=$(echo "$read_exif" |grep 0x829a |cut -d "|" -f2 |cut -d " " -f1 |sed 's/\// /')
-	light=$(echo "$read_exif" |grep 0x8824 |cut -d "|" -f2)
-	[[ $(echo -n $intermediate_speed | wc -c) == 1 ]] && speed="${intermediate_speed} 1" || speed=$intermediate_speed
+	# read_exif=$(exif -i $1)
+	# intermediate_speed=$(echo "$read_exif" |grep 0x829a |cut -d "|" -f2 |cut -d " " -f1 |sed 's/\// /')
+	# light=$(echo "$read_exif" |grep 0x8824 |cut -d "|" -f2)
+	# [[ $(echo -n $intermediate_speed | wc -c) == 1 ]] && speed="${intermediate_speed} 1" || speed=$intermediate_speed
 	djpeg $1 | cjpeg -q 90 > $TMP_OPTPIC_PATH
-	exif -c --ifd=EXIF -i --tag 0x829a --set-value "$speed" $TMP_OPTPIC_PATH >/dev/null
-	[[ $? == 0 ]] && mv $TMP_OPTPIC_PATH.modified.jpeg $TMP_OPTPIC_PATH
-	exif -c --ifd=EXIF -i --tag=0x8827 --set-value=$light $TMP_OPTPIC_PATH >/dev/null
-	[[ $? == 0 ]] && mv $TMP_OPTPIC_PATH.modified.jpeg $1 || exit 1
-	rm $TMP_OPTPIC_PATH
+	#exif -c --ifd=EXIF -i --tag 0x829a --set-value "$speed" $TMP_OPTPIC_PATH >/dev/null
+	#[[ $? == 0 ]] && mv $TMP_OPTPIC_PATH.modified.jpeg $TMP_OPTPIC_PATH
+	#exif -c --ifd=EXIF -i --tag=0x8827 --set-value=$light $TMP_OPTPIC_PATH >/dev/null
+	#[[ $? == 0 ]] && mv $TMP_OPTPIC_PATH.modified.jpeg $1 || exit 1
+	mv $TMP_OPTPIC_PATH $1
+	#rm $TMP_OPTPIC_PATH
 }
 
 umask 002
@@ -102,7 +103,7 @@ while true; do
 	new_file_path=$PIC_DIR/$cur_date/$cur_time.jpg
 	mv $TMP_PIC_PATH $PIC_DIR/$cur_date/$cur_time.jpg
 	ln -sf $new_file_path $PIC_DIR/latest.jpg
-	cp $PIC_DIR/latest_th.jpg $PIC_DIR/previous_th.jpg
+	test -f $PIC_DIR/latest_th.jpg && cp $PIC_DIR/latest_th.jpg $PIC_DIR/previous_th.jpg
 	create_thumbnail $PIC_DIR/latest.jpg $PIC_DIR/latest_th.jpg
 	snap_interval=$(get_snap_interval_from_diff $PIC_DIR/previous_th.jpg $PIC_DIR/latest_th.jpg)
 	count=$((count + 1))
