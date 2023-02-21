@@ -16,8 +16,7 @@ There are configuration files for
 
 
 ## Installation
-
-Here is the list of the required dependencies
+### Dependencies explained
 
 To take pictures
 - raspistill (should already be installed)
@@ -36,9 +35,10 @@ To setup your own DNS entry and SSL cert
 - jq
 - dnsutils
 
+### Step by step installation
 ```bash
 sudo apt-get update
-sudo apt install -y nginx git ffmpeg libomxil-bellagio-bin imagemagick dnsutils jq curl certbot
+sudo apt install -y nginx git ffmpeg libomxil-bellagio-bin imagemagick dnsutils jq curl certbot python3-certbot-nginx
 ```
 
 Create the isitfoggy user and home directories
