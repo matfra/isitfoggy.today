@@ -6,7 +6,7 @@ At the end of the day, it will generate a timelapse in mp4 format. Example:
 https://zero.isitfoggy.com
 
 
-NOTE: This code has been running on a raspberry pi zero for 8 years but unless you are stuck with an old raspberry pi zero, you should checkout https://github.com/matfra/fenetre.cam is a more modern/extensible python rewrite supproting many image sources.
+NOTE: This code has been running on a raspberry pi zero for 8 years but unless you are stuck with an old raspberry pi zero, you should checkout https://github.com/matfra/fenetre.cam which is a more modern/extensible python rewrite supporting many image sources.
 
 
 There are configuration files for 
