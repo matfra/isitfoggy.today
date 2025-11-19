@@ -2,10 +2,11 @@
 ## Introduction
 This uses your Raspberry Pi and its camera to take a bunch of pictures every minutes
 and serves them via a small website.
-At the end of the day, it will generate a timelapse in mp4 format
+At the end of the day, it will generate a timelapse in mp4 format. Example:
+https://zero.isitfoggy.com
 
-Example:
-https://isitfoggy.com
+
+NOTE: This code has been running on a raspberry pi zero for 8 years but unless you are stuck with an old raspberry pi zero, you should checkout https://github.com/matfra/fenetre.cam is a more modern/extensible python rewrite supproting many image sources.
 
 
 There are configuration files for 
